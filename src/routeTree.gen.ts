@@ -13,7 +13,9 @@ import { Route as SecurityRouteImport } from './routes/security'
 import { Route as RequestRegionRouteImport } from './routes/request-region'
 import { Route as PrivacyRouteImport } from './routes/privacy'
 import { Route as LoginRouteImport } from './routes/login'
+import { Route as AuthenticatedRouteImport } from './routes/_authenticated'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as AuthenticatedMyBenefitsRouteImport } from './routes/_authenticated.my-benefits'
 
 const SecurityRoute = SecurityRouteImport.update({
   id: '/security',
@@ -35,10 +37,19 @@ const LoginRoute = LoginRouteImport.update({
   path: '/login',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AuthenticatedRoute = AuthenticatedRouteImport.update({
+  id: '/_authenticated',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
+} as any)
+const AuthenticatedMyBenefitsRoute = AuthenticatedMyBenefitsRouteImport.update({
+  id: '/my-benefits',
+  path: '/my-benefits',
+  getParentRoute: () => AuthenticatedRoute,
 } as any)
 
 export interface FileRoutesByFullPath {
@@ -47,6 +58,7 @@ export interface FileRoutesByFullPath {
   '/privacy': typeof PrivacyRoute
   '/request-region': typeof RequestRegionRoute
   '/security': typeof SecurityRoute
+  '/my-benefits': typeof AuthenticatedMyBenefitsRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -54,25 +66,49 @@ export interface FileRoutesByTo {
   '/privacy': typeof PrivacyRoute
   '/request-region': typeof RequestRegionRoute
   '/security': typeof SecurityRoute
+  '/my-benefits': typeof AuthenticatedMyBenefitsRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/_authenticated': typeof AuthenticatedRouteWithChildren
   '/login': typeof LoginRoute
   '/privacy': typeof PrivacyRoute
   '/request-region': typeof RequestRegionRoute
   '/security': typeof SecurityRoute
+  '/_authenticated/my-benefits': typeof AuthenticatedMyBenefitsRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/login' | '/privacy' | '/request-region' | '/security'
+  fullPaths:
+    | '/'
+    | '/login'
+    | '/privacy'
+    | '/request-region'
+    | '/security'
+    | '/my-benefits'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/login' | '/privacy' | '/request-region' | '/security'
-  id: '__root__' | '/' | '/login' | '/privacy' | '/request-region' | '/security'
+  to:
+    | '/'
+    | '/login'
+    | '/privacy'
+    | '/request-region'
+    | '/security'
+    | '/my-benefits'
+  id:
+    | '__root__'
+    | '/'
+    | '/_authenticated'
+    | '/login'
+    | '/privacy'
+    | '/request-region'
+    | '/security'
+    | '/_authenticated/my-benefits'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  AuthenticatedRoute: typeof AuthenticatedRouteWithChildren
   LoginRoute: typeof LoginRoute
   PrivacyRoute: typeof PrivacyRoute
   RequestRegionRoute: typeof RequestRegionRoute
@@ -109,6 +145,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof LoginRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/_authenticated': {
+      id: '/_authenticated'
+      path: ''
+      fullPath: '/'
+      preLoaderRoute: typeof AuthenticatedRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/': {
       id: '/'
       path: '/'
@@ -116,11 +159,31 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/_authenticated/my-benefits': {
+      id: '/_authenticated/my-benefits'
+      path: '/my-benefits'
+      fullPath: '/my-benefits'
+      preLoaderRoute: typeof AuthenticatedMyBenefitsRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
   }
 }
 
+interface AuthenticatedRouteChildren {
+  AuthenticatedMyBenefitsRoute: typeof AuthenticatedMyBenefitsRoute
+}
+
+const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
+  AuthenticatedMyBenefitsRoute: AuthenticatedMyBenefitsRoute,
+}
+
+const AuthenticatedRouteWithChildren = AuthenticatedRoute._addFileChildren(
+  AuthenticatedRouteChildren,
+)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  AuthenticatedRoute: AuthenticatedRouteWithChildren,
   LoginRoute: LoginRoute,
   PrivacyRoute: PrivacyRoute,
   RequestRegionRoute: RequestRegionRoute,
@@ -129,3 +192,13 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { startInstance } from './start.ts'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+    config: Awaited<ReturnType<typeof startInstance.getOptions>>
+  }
+}
