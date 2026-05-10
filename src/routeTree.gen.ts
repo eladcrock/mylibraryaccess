@@ -10,6 +10,7 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as SecurityRouteImport } from './routes/security'
+import { Route as ResultsRouteImport } from './routes/results'
 import { Route as RequestRegionRouteImport } from './routes/request-region'
 import { Route as PrivacyRouteImport } from './routes/privacy'
 import { Route as LoginRouteImport } from './routes/login'
@@ -21,6 +22,11 @@ import { Route as AuthenticatedMyBenefitsRouteImport } from './routes/_authentic
 const SecurityRoute = SecurityRouteImport.update({
   id: '/security',
   path: '/security',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ResultsRoute = ResultsRouteImport.update({
+  id: '/results',
+  path: '/results',
   getParentRoute: () => rootRouteImport,
 } as any)
 const RequestRegionRoute = RequestRegionRouteImport.update({
@@ -64,6 +70,7 @@ export interface FileRoutesByFullPath {
   '/login': typeof LoginRoute
   '/privacy': typeof PrivacyRoute
   '/request-region': typeof RequestRegionRoute
+  '/results': typeof ResultsRoute
   '/security': typeof SecurityRoute
   '/my-benefits': typeof AuthenticatedMyBenefitsRoute
 }
@@ -73,6 +80,7 @@ export interface FileRoutesByTo {
   '/login': typeof LoginRoute
   '/privacy': typeof PrivacyRoute
   '/request-region': typeof RequestRegionRoute
+  '/results': typeof ResultsRoute
   '/security': typeof SecurityRoute
   '/my-benefits': typeof AuthenticatedMyBenefitsRoute
 }
@@ -84,6 +92,7 @@ export interface FileRoutesById {
   '/login': typeof LoginRoute
   '/privacy': typeof PrivacyRoute
   '/request-region': typeof RequestRegionRoute
+  '/results': typeof ResultsRoute
   '/security': typeof SecurityRoute
   '/_authenticated/my-benefits': typeof AuthenticatedMyBenefitsRoute
 }
@@ -95,6 +104,7 @@ export interface FileRouteTypes {
     | '/login'
     | '/privacy'
     | '/request-region'
+    | '/results'
     | '/security'
     | '/my-benefits'
   fileRoutesByTo: FileRoutesByTo
@@ -104,6 +114,7 @@ export interface FileRouteTypes {
     | '/login'
     | '/privacy'
     | '/request-region'
+    | '/results'
     | '/security'
     | '/my-benefits'
   id:
@@ -114,6 +125,7 @@ export interface FileRouteTypes {
     | '/login'
     | '/privacy'
     | '/request-region'
+    | '/results'
     | '/security'
     | '/_authenticated/my-benefits'
   fileRoutesById: FileRoutesById
@@ -125,6 +137,7 @@ export interface RootRouteChildren {
   LoginRoute: typeof LoginRoute
   PrivacyRoute: typeof PrivacyRoute
   RequestRegionRoute: typeof RequestRegionRoute
+  ResultsRoute: typeof ResultsRoute
   SecurityRoute: typeof SecurityRoute
 }
 
@@ -135,6 +148,13 @@ declare module '@tanstack/react-router' {
       path: '/security'
       fullPath: '/security'
       preLoaderRoute: typeof SecurityRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/results': {
+      id: '/results'
+      path: '/results'
+      fullPath: '/results'
+      preLoaderRoute: typeof ResultsRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/request-region': {
@@ -208,6 +228,7 @@ const rootRouteChildren: RootRouteChildren = {
   LoginRoute: LoginRoute,
   PrivacyRoute: PrivacyRoute,
   RequestRegionRoute: RequestRegionRoute,
+  ResultsRoute: ResultsRoute,
   SecurityRoute: SecurityRoute,
 }
 export const routeTree = rootRouteImport
