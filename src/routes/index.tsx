@@ -134,6 +134,26 @@ function Index() {
           </div>
         </div>
       </section>
+
+      {/* Request a region */}
+      <section className="border-b border-border/60">
+        <div className="mx-auto flex max-w-6xl flex-col items-start gap-3 px-4 py-10 sm:flex-row sm:items-center sm:justify-between">
+          <div>
+            <h3 className="font-display text-xl text-foreground">
+              Don't see your area?
+            </h3>
+            <p className="text-sm text-muted-foreground">
+              We're starting with California. Tell us where to expand next.
+            </p>
+          </div>
+          <Link
+            to="/request-region"
+            className="inline-flex items-center gap-2 rounded-md border border-border bg-card px-4 py-2 text-sm font-medium text-foreground hover:bg-accent/10"
+          >
+            Request a region <ArrowRight className="h-4 w-4" />
+          </Link>
+        </div>
+      </section>
     </div>
   );
 }
