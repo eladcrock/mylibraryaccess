@@ -13,6 +13,7 @@ import { Route as SecurityRouteImport } from './routes/security'
 import { Route as RequestRegionRouteImport } from './routes/request-region'
 import { Route as PrivacyRouteImport } from './routes/privacy'
 import { Route as LoginRouteImport } from './routes/login'
+import { Route as GetStartedRouteImport } from './routes/get-started'
 import { Route as AuthenticatedRouteImport } from './routes/_authenticated'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AuthenticatedMyBenefitsRouteImport } from './routes/_authenticated.my-benefits'
@@ -37,6 +38,11 @@ const LoginRoute = LoginRouteImport.update({
   path: '/login',
   getParentRoute: () => rootRouteImport,
 } as any)
+const GetStartedRoute = GetStartedRouteImport.update({
+  id: '/get-started',
+  path: '/get-started',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AuthenticatedRoute = AuthenticatedRouteImport.update({
   id: '/_authenticated',
   getParentRoute: () => rootRouteImport,
@@ -54,6 +60,7 @@ const AuthenticatedMyBenefitsRoute = AuthenticatedMyBenefitsRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/get-started': typeof GetStartedRoute
   '/login': typeof LoginRoute
   '/privacy': typeof PrivacyRoute
   '/request-region': typeof RequestRegionRoute
@@ -62,6 +69,7 @@ export interface FileRoutesByFullPath {
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/get-started': typeof GetStartedRoute
   '/login': typeof LoginRoute
   '/privacy': typeof PrivacyRoute
   '/request-region': typeof RequestRegionRoute
@@ -72,6 +80,7 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/_authenticated': typeof AuthenticatedRouteWithChildren
+  '/get-started': typeof GetStartedRoute
   '/login': typeof LoginRoute
   '/privacy': typeof PrivacyRoute
   '/request-region': typeof RequestRegionRoute
@@ -82,6 +91,7 @@ export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
+    | '/get-started'
     | '/login'
     | '/privacy'
     | '/request-region'
@@ -90,6 +100,7 @@ export interface FileRouteTypes {
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
+    | '/get-started'
     | '/login'
     | '/privacy'
     | '/request-region'
@@ -99,6 +110,7 @@ export interface FileRouteTypes {
     | '__root__'
     | '/'
     | '/_authenticated'
+    | '/get-started'
     | '/login'
     | '/privacy'
     | '/request-region'
@@ -109,6 +121,7 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AuthenticatedRoute: typeof AuthenticatedRouteWithChildren
+  GetStartedRoute: typeof GetStartedRoute
   LoginRoute: typeof LoginRoute
   PrivacyRoute: typeof PrivacyRoute
   RequestRegionRoute: typeof RequestRegionRoute
@@ -143,6 +156,13 @@ declare module '@tanstack/react-router' {
       path: '/login'
       fullPath: '/login'
       preLoaderRoute: typeof LoginRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/get-started': {
+      id: '/get-started'
+      path: '/get-started'
+      fullPath: '/get-started'
+      preLoaderRoute: typeof GetStartedRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/_authenticated': {
@@ -184,6 +204,7 @@ const AuthenticatedRouteWithChildren = AuthenticatedRoute._addFileChildren(
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AuthenticatedRoute: AuthenticatedRouteWithChildren,
+  GetStartedRoute: GetStartedRoute,
   LoginRoute: LoginRoute,
   PrivacyRoute: PrivacyRoute,
   RequestRegionRoute: RequestRegionRoute,
