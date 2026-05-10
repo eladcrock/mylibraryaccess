@@ -14,16 +14,482 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      benefits: {
+        Row: {
+          category: Database["public"]["Enums"]["benefit_category"]
+          description: string | null
+          icon: string | null
+          id: string
+          name: string
+          slug: string
+        }
+        Insert: {
+          category: Database["public"]["Enums"]["benefit_category"]
+          description?: string | null
+          icon?: string | null
+          id?: string
+          name: string
+          slug: string
+        }
+        Update: {
+          category?: Database["public"]["Enums"]["benefit_category"]
+          description?: string | null
+          icon?: string | null
+          id?: string
+          name?: string
+          slug?: string
+        }
+        Relationships: []
+      }
+      counties: {
+        Row: {
+          fips: string | null
+          id: string
+          name: string
+          state_id: string
+        }
+        Insert: {
+          fips?: string | null
+          id?: string
+          name: string
+          state_id: string
+        }
+        Update: {
+          fips?: string | null
+          id?: string
+          name?: string
+          state_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "counties_state_id_fkey"
+            columns: ["state_id"]
+            isOneToOne: false
+            referencedRelation: "states"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      eligibility_rules: {
+        Row: {
+          fee_cents: number
+          id: string
+          library_system_id: string
+          notes: string | null
+          paid: boolean
+          priority: number
+          requires_in_person: boolean
+          rule_type: Database["public"]["Enums"]["rule_type"]
+          scope_city: string | null
+          scope_county_id: string | null
+          scope_state_id: string | null
+        }
+        Insert: {
+          fee_cents?: number
+          id?: string
+          library_system_id: string
+          notes?: string | null
+          paid?: boolean
+          priority?: number
+          requires_in_person?: boolean
+          rule_type: Database["public"]["Enums"]["rule_type"]
+          scope_city?: string | null
+          scope_county_id?: string | null
+          scope_state_id?: string | null
+        }
+        Update: {
+          fee_cents?: number
+          id?: string
+          library_system_id?: string
+          notes?: string | null
+          paid?: boolean
+          priority?: number
+          requires_in_person?: boolean
+          rule_type?: Database["public"]["Enums"]["rule_type"]
+          scope_city?: string | null
+          scope_county_id?: string | null
+          scope_state_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "eligibility_rules_library_system_id_fkey"
+            columns: ["library_system_id"]
+            isOneToOne: false
+            referencedRelation: "library_systems"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "eligibility_rules_scope_county_id_fkey"
+            columns: ["scope_county_id"]
+            isOneToOne: false
+            referencedRelation: "counties"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "eligibility_rules_scope_state_id_fkey"
+            columns: ["scope_state_id"]
+            isOneToOne: false
+            referencedRelation: "states"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      favorites: {
+        Row: {
+          created_at: string
+          library_system_id: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          library_system_id: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          library_system_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "favorites_library_system_id_fkey"
+            columns: ["library_system_id"]
+            isOneToOne: false
+            referencedRelation: "library_systems"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      library_benefits: {
+        Row: {
+          benefit_id: string
+          library_system_id: string
+          limit_text: string | null
+          notes: string | null
+        }
+        Insert: {
+          benefit_id: string
+          library_system_id: string
+          limit_text?: string | null
+          notes?: string | null
+        }
+        Update: {
+          benefit_id?: string
+          library_system_id?: string
+          limit_text?: string | null
+          notes?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "library_benefits_benefit_id_fkey"
+            columns: ["benefit_id"]
+            isOneToOne: false
+            referencedRelation: "benefits"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "library_benefits_library_system_id_fkey"
+            columns: ["library_system_id"]
+            isOneToOne: false
+            referencedRelation: "library_systems"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      library_systems: {
+        Row: {
+          apply_url: string | null
+          confidence_score: number
+          created_at: string
+          description: string | null
+          fee_cents: number
+          fee_notes: string | null
+          highlights: string | null
+          id: string
+          jurisdiction_type: Database["public"]["Enums"]["jurisdiction_type"]
+          last_verified_at: string | null
+          name: string
+          online_signup: boolean
+          primary_city: string | null
+          primary_county_id: string | null
+          primary_state_id: string | null
+          slug: string
+          updated_at: string
+          website: string | null
+        }
+        Insert: {
+          apply_url?: string | null
+          confidence_score?: number
+          created_at?: string
+          description?: string | null
+          fee_cents?: number
+          fee_notes?: string | null
+          highlights?: string | null
+          id?: string
+          jurisdiction_type: Database["public"]["Enums"]["jurisdiction_type"]
+          last_verified_at?: string | null
+          name: string
+          online_signup?: boolean
+          primary_city?: string | null
+          primary_county_id?: string | null
+          primary_state_id?: string | null
+          slug: string
+          updated_at?: string
+          website?: string | null
+        }
+        Update: {
+          apply_url?: string | null
+          confidence_score?: number
+          created_at?: string
+          description?: string | null
+          fee_cents?: number
+          fee_notes?: string | null
+          highlights?: string | null
+          id?: string
+          jurisdiction_type?: Database["public"]["Enums"]["jurisdiction_type"]
+          last_verified_at?: string | null
+          name?: string
+          online_signup?: boolean
+          primary_city?: string | null
+          primary_county_id?: string | null
+          primary_state_id?: string | null
+          slug?: string
+          updated_at?: string
+          website?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "library_systems_primary_county_id_fkey"
+            columns: ["primary_county_id"]
+            isOneToOne: false
+            referencedRelation: "counties"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "library_systems_primary_state_id_fkey"
+            columns: ["primary_state_id"]
+            isOneToOne: false
+            referencedRelation: "states"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      profiles: {
+        Row: {
+          created_at: string
+          display_name: string | null
+          email: string | null
+          id: string
+        }
+        Insert: {
+          created_at?: string
+          display_name?: string | null
+          email?: string | null
+          id: string
+        }
+        Update: {
+          created_at?: string
+          display_name?: string | null
+          email?: string | null
+          id?: string
+        }
+        Relationships: []
+      }
+      reciprocity: {
+        Row: {
+          library_system_id: string
+          notes: string | null
+          reciprocal_with_id: string
+        }
+        Insert: {
+          library_system_id: string
+          notes?: string | null
+          reciprocal_with_id: string
+        }
+        Update: {
+          library_system_id?: string
+          notes?: string | null
+          reciprocal_with_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "reciprocity_library_system_id_fkey"
+            columns: ["library_system_id"]
+            isOneToOne: false
+            referencedRelation: "library_systems"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "reciprocity_reciprocal_with_id_fkey"
+            columns: ["reciprocal_with_id"]
+            isOneToOne: false
+            referencedRelation: "library_systems"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      scrape_jobs: {
+        Row: {
+          created_at: string
+          diff_json: Json | null
+          error: string | null
+          finished_at: string | null
+          id: string
+          library_system_id: string
+          started_at: string | null
+          status: Database["public"]["Enums"]["scrape_status"]
+        }
+        Insert: {
+          created_at?: string
+          diff_json?: Json | null
+          error?: string | null
+          finished_at?: string | null
+          id?: string
+          library_system_id: string
+          started_at?: string | null
+          status?: Database["public"]["Enums"]["scrape_status"]
+        }
+        Update: {
+          created_at?: string
+          diff_json?: Json | null
+          error?: string | null
+          finished_at?: string | null
+          id?: string
+          library_system_id?: string
+          started_at?: string | null
+          status?: Database["public"]["Enums"]["scrape_status"]
+        }
+        Relationships: [
+          {
+            foreignKeyName: "scrape_jobs_library_system_id_fkey"
+            columns: ["library_system_id"]
+            isOneToOne: false
+            referencedRelation: "library_systems"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      states: {
+        Row: {
+          code: string
+          id: string
+          name: string
+        }
+        Insert: {
+          code: string
+          id?: string
+          name: string
+        }
+        Update: {
+          code?: string
+          id?: string
+          name?: string
+        }
+        Relationships: []
+      }
+      suggested_corrections: {
+        Row: {
+          created_at: string
+          field: string
+          id: string
+          library_system_id: string
+          notes: string | null
+          status: Database["public"]["Enums"]["correction_status"]
+          submitter_email: string | null
+          submitter_user_id: string | null
+          suggested_value: string
+        }
+        Insert: {
+          created_at?: string
+          field: string
+          id?: string
+          library_system_id: string
+          notes?: string | null
+          status?: Database["public"]["Enums"]["correction_status"]
+          submitter_email?: string | null
+          submitter_user_id?: string | null
+          suggested_value: string
+        }
+        Update: {
+          created_at?: string
+          field?: string
+          id?: string
+          library_system_id?: string
+          notes?: string | null
+          status?: Database["public"]["Enums"]["correction_status"]
+          submitter_email?: string | null
+          submitter_user_id?: string | null
+          suggested_value?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "suggested_corrections_library_system_id_fkey"
+            columns: ["library_system_id"]
+            isOneToOne: false
+            referencedRelation: "library_systems"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      user_roles: {
+        Row: {
+          id: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Insert: {
+          id?: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Update: {
+          id?: string
+          role?: Database["public"]["Enums"]["app_role"]
+          user_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      has_role: {
+        Args: {
+          _role: Database["public"]["Enums"]["app_role"]
+          _user_id: string
+        }
+        Returns: boolean
+      }
     }
     Enums: {
-      [_ in never]: never
+      app_role: "admin" | "user"
+      benefit_category:
+        | "streaming"
+        | "ebooks"
+        | "audiobooks"
+        | "learning"
+        | "news"
+        | "museum"
+        | "languages"
+        | "career"
+        | "makerspace"
+        | "research"
+        | "music"
+      correction_status: "pending" | "accepted" | "rejected"
+      jurisdiction_type: "city" | "county" | "consortium" | "state"
+      rule_type:
+        | "resident_of_county"
+        | "resident_of_city"
+        | "resident_of_state"
+        | "us_resident"
+        | "property_owner"
+        | "student"
+        | "educator"
+        | "employee"
+        | "reciprocal"
+        | "paid_nonresident"
+      scrape_status: "queued" | "running" | "succeeded" | "failed"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -150,6 +616,36 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {},
+    Enums: {
+      app_role: ["admin", "user"],
+      benefit_category: [
+        "streaming",
+        "ebooks",
+        "audiobooks",
+        "learning",
+        "news",
+        "museum",
+        "languages",
+        "career",
+        "makerspace",
+        "research",
+        "music",
+      ],
+      correction_status: ["pending", "accepted", "rejected"],
+      jurisdiction_type: ["city", "county", "consortium", "state"],
+      rule_type: [
+        "resident_of_county",
+        "resident_of_city",
+        "resident_of_state",
+        "us_resident",
+        "property_owner",
+        "student",
+        "educator",
+        "employee",
+        "reciprocal",
+        "paid_nonresident",
+      ],
+      scrape_status: ["queued", "running", "succeeded", "failed"],
+    },
   },
 } as const
