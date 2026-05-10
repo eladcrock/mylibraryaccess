@@ -12,6 +12,7 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as SecurityRouteImport } from './routes/security'
 import { Route as RequestRegionRouteImport } from './routes/request-region'
 import { Route as PrivacyRouteImport } from './routes/privacy'
+import { Route as LoginRouteImport } from './routes/login'
 import { Route as IndexRouteImport } from './routes/index'
 
 const SecurityRoute = SecurityRouteImport.update({
@@ -29,6 +30,11 @@ const PrivacyRoute = PrivacyRouteImport.update({
   path: '/privacy',
   getParentRoute: () => rootRouteImport,
 } as any)
+const LoginRoute = LoginRouteImport.update({
+  id: '/login',
+  path: '/login',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
@@ -37,12 +43,14 @@ const IndexRoute = IndexRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/login': typeof LoginRoute
   '/privacy': typeof PrivacyRoute
   '/request-region': typeof RequestRegionRoute
   '/security': typeof SecurityRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/login': typeof LoginRoute
   '/privacy': typeof PrivacyRoute
   '/request-region': typeof RequestRegionRoute
   '/security': typeof SecurityRoute
@@ -50,20 +58,22 @@ export interface FileRoutesByTo {
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/login': typeof LoginRoute
   '/privacy': typeof PrivacyRoute
   '/request-region': typeof RequestRegionRoute
   '/security': typeof SecurityRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/privacy' | '/request-region' | '/security'
+  fullPaths: '/' | '/login' | '/privacy' | '/request-region' | '/security'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/privacy' | '/request-region' | '/security'
-  id: '__root__' | '/' | '/privacy' | '/request-region' | '/security'
+  to: '/' | '/login' | '/privacy' | '/request-region' | '/security'
+  id: '__root__' | '/' | '/login' | '/privacy' | '/request-region' | '/security'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  LoginRoute: typeof LoginRoute
   PrivacyRoute: typeof PrivacyRoute
   RequestRegionRoute: typeof RequestRegionRoute
   SecurityRoute: typeof SecurityRoute
@@ -92,6 +102,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof PrivacyRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/login': {
+      id: '/login'
+      path: '/login'
+      fullPath: '/login'
+      preLoaderRoute: typeof LoginRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/': {
       id: '/'
       path: '/'
@@ -104,6 +121,7 @@ declare module '@tanstack/react-router' {
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  LoginRoute: LoginRoute,
   PrivacyRoute: PrivacyRoute,
   RequestRegionRoute: RequestRegionRoute,
   SecurityRoute: SecurityRoute,
@@ -111,3 +129,13 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { startInstance } from './start.ts'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+    config: Awaited<ReturnType<typeof startInstance.getOptions>>
+  }
+}
