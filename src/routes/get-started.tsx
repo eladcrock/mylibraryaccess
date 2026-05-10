@@ -78,9 +78,9 @@ function GetStartedPage() {
       search: {
         state: stateId ?? "",
         county: countyId ?? "",
-        resident: resident ? "1" : "",
-        property: propertyOwner ? "1" : "",
-        student: student ? "1" : "",
+        resident,
+        property: propertyOwner,
+        student,
       },
     });
   }
