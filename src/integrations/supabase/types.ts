@@ -328,6 +328,45 @@ export type Database = {
           },
         ]
       }
+      region_requests: {
+        Row: {
+          created_at: string
+          email: string | null
+          id: string
+          notes: string | null
+          region: string
+          source_ip_hash: string | null
+          status: Database["public"]["Enums"]["region_request_status"]
+          system_name: string | null
+          system_url: string | null
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          email?: string | null
+          id?: string
+          notes?: string | null
+          region: string
+          source_ip_hash?: string | null
+          status?: Database["public"]["Enums"]["region_request_status"]
+          system_name?: string | null
+          system_url?: string | null
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          email?: string | null
+          id?: string
+          notes?: string | null
+          region?: string
+          source_ip_hash?: string | null
+          status?: Database["public"]["Enums"]["region_request_status"]
+          system_name?: string | null
+          system_url?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
       scrape_jobs: {
         Row: {
           created_at: string
@@ -478,6 +517,7 @@ export type Database = {
         | "music"
       correction_status: "pending" | "accepted" | "rejected"
       jurisdiction_type: "city" | "county" | "consortium" | "state"
+      region_request_status: "new" | "reviewed" | "added" | "rejected"
       rule_type:
         | "resident_of_county"
         | "resident_of_city"
@@ -633,6 +673,7 @@ export const Constants = {
       ],
       correction_status: ["pending", "accepted", "rejected"],
       jurisdiction_type: ["city", "county", "consortium", "state"],
+      region_request_status: ["new", "reviewed", "added", "rejected"],
       rule_type: [
         "resident_of_county",
         "resident_of_city",

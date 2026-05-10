@@ -1,158 +1,67 @@
+## Goal
 
-# Library Card Finder — Build Plan
+1. Let visitors request that a new region (state/county/city) be added to the library data.
+2. Ship a Privacy Policy and Security page that accurately reflect what the app actually collects and how it's protected — and link them from the footer.
 
-A modern civic-tech web app that helps people discover which public library cards they're eligible for, what each card unlocks (Kanopy, Hoopla, Libby, etc.), and where to apply. CA-first, architected to scale to all 50 states.
+## 1. Request-a-region
 
-## Scope of this build
+**New route** `src/routes/request-region.tsx`
+- Form fields: region (free text, e.g. "Travis County, TX"), optional library system name, optional library website URL, optional email (so we can notify when added), optional notes. Zod-validated, trimmed, length-capped.
+- Submits via a `createServerFn` that inserts into a new `region_requests` table.
+- Success state thanks the user; honeypot + simple rate-limit by IP hash to deter spam.
+- SEO `head()`: title "Request a library region — Library Card Finder", noindex'd is fine.
 
-Full vision in one pass, with a clear honest line on what's real vs. scaffolded:
+**New table** `region_requests`
+- Columns (domain): region, system_name, system_url, email, notes, status (`new` | `reviewed` | `added`), source_ip_hash.
+- RLS:
+  - Anonymous + authenticated users: INSERT only.
+  - Admins (`has_role(auth.uid(),'admin')`): SELECT / UPDATE.
+  - No public SELECT (protects submitter emails).
 
-- **Real & functional:** survey flow, eligibility engine, results dashboard, library detail pages, favorites & compare, SEO landing pages, admin dashboard (CRUD), auth, 12 seeded CA library systems with verified eligibility + benefits.
-- **Scaffolded for later:** scraping pipeline (architecture + admin trigger UI + a stub server function — real Playwright scraping needs a separate Node worker, which the edge runtime can't host). AI summarization hook is wired but off by default.
+**Entry points**
+- Footer: "Request a region" link.
+- Landing page: small CTA strip near the bottom — "Don't see your area? Request a region →".
+- Future results page (when built) will reuse the same link in its empty state.
 
-## Design direction — "Civic Trust"
+## 2. Privacy Policy (`/privacy`)
 
-- Palette: navy `#0f1b3d`, deep blue `#1e3a5f`, mid blue `#3b6fa0`, paper `#e8edf3`, white background. Accent emerald for "eligible" states.
-- Typography: Inter (body) + Instrument Serif (display) for a Gov.uk-meets-fintech feel.
-- Generous whitespace, soft shadows, 12px radius, subtle motion (Framer Motion fades + slide-ups).
-- Dark mode supported via tokens.
-- Mobile-first, fully accessible (WCAG AA, keyboard nav, focus states, reduced-motion).
+Written to match what the app actually does today, not boilerplate:
+- What we collect: optional account email + Google profile basics on sign-in; favorites; suggested corrections; region requests (with optional email); standard server logs.
+- What we don't: no ad tracking, no selling data, no third-party analytics beyond what Lovable Cloud provides for ops.
+- Cookies: only auth/session cookies from Lovable Cloud.
+- Third parties: Lovable Cloud (hosting + database + auth), Google (only if user signs in with Google).
+- Your rights: account deletion, data export on request, contact email placeholder `privacy@librarycardfinder.app` (user can swap later).
+- Children: not directed at children under 13.
+- Effective date + "last updated" stamp.
 
-## User flows
+## 3. Security page (`/security`)
 
-### 1. Landing `/`
-- Hero: "Find every library card you're eligible for." Search/CTA → starts survey.
-- Trust strip: "12 California systems · 40+ digital benefits tracked · Updated monthly".
-- Featured benefits row (Kanopy, Hoopla, Libby, LinkedIn Learning, NYT, museum passes).
-- "How it works" (3 steps), popular SEO links, FAQ.
+Plain-English summary of real controls:
+- Transport: HTTPS everywhere.
+- Auth: email/password + Google OAuth via Lovable Cloud; sessions in httpOnly cookies; passwords never seen by us.
+- Authorization: Postgres Row Level Security on every table; admin-only tables for corrections, region requests, scrape jobs.
+- Data minimization: we only ask for email at signup; survey answers (county, status flags) stay client-side unless user chooses to save favorites.
+- Storage: managed Postgres with encryption at rest and automatic backups via Lovable Cloud.
+- Secrets: server-only API keys stored as Lovable Cloud secrets, never shipped to the browser.
+- Reporting: `security@librarycardfinder.app` placeholder for responsible disclosure; we aim to acknowledge within 72h.
+- What's out of scope today: no payments, no PII beyond email, no third-party trackers.
 
-### 2. Survey `/get-started`
-Card-based, one question per step, progress bar, back/forward, mobile-first.
-Steps: state → county → city (optional) → status flags (student / educator / veteran / senior) → property in another county? → email (optional, to save results).
-State stored in URL search params so results are shareable.
+I'll also enable Lovable Cloud's leaked-password (HIBP) check during this pass since the Security page promises real password hygiene.
 
-### 3. Results `/results`
-Grouped sections, collapsible:
-- ✅ Eligible now (online signup)
-- 🏛 Eligible with in-person visit
-- 📱 Limited digital access (e-card only)
-- 💳 Non-resident paid card
-- 🤝 Reciprocal / potentially eligible
+## 4. Footer
 
-Each result card: library name, jurisdiction, eligibility summary, benefit icon row, "Apply online" CTA, "Details", favorite ⭐, "Add to compare".
-Filters: benefit (Kanopy / Hoopla / Libby / LinkedIn Learning / museum passes / etc.), online-signup-only, free-only, sort by benefit count.
-Sticky compare bar appears when 2-4 selected → `/compare`.
+Update `src/components/site-footer.tsx` to a two-row layout:
+- Left: copyright.
+- Right: links — Request a region · Privacy · Security · Suggest a correction (when that page exists).
 
-### 4. Library detail `/library/$slug`
-Hero with library name, jurisdiction, eligibility badge, apply CTA.
-Sections: Eligibility rules, Benefits grid (with per-service limits like "Kanopy: 10 plays/month"), Reciprocity, Fees, Hours/branches link out, Last verified date + confidence score, "Suggest a correction" form.
-SSR with route-specific `head()` for SEO + JSON-LD `LocalBusiness` / `Library`.
+## Technical notes
 
-### 5. Compare `/compare?ids=...`
-Side-by-side table of up to 4 libraries across eligibility, fees, and each benefit.
+- Migration creates `region_requests` + RLS + an `update_updated_at_column` trigger; reuses existing `app_role` enum and `has_role` function from prior auth migration.
+- Server fn lives at `src/lib/region-requests.functions.ts` (client-safe path), with `.inputValidator(zodSchema.parse)` and `.handler()` doing the insert with the service-role-free anon client (RLS allows the insert).
+- No business-logic changes elsewhere; eligibility engine and seed data untouched.
+- All three new pages added to the future sitemap route when it lands.
 
-### 6. Favorites `/favorites` (auth required)
-Saved libraries list.
+## Out of scope
 
-### 7. SEO landing pages
-Static routes generated for high-intent queries:
-- `/best/california-library-cards`
-- `/best/libraries-with-kanopy`
-- `/best/libraries-with-linkedin-learning`
-- `/best/non-resident-library-cards`
-- `/best/free-museum-passes`
-Each uses real DB data filtered server-side, with unique title/description/og tags and FAQ schema.
-
-### 8. Admin `/admin` (role-gated)
-- Library list with confidence score, last-verified, status.
-- Edit library (eligibility rules, benefits, fees, links).
-- Suggested corrections inbox (from public form).
-- "Run verification" button → triggers stub scraping job, logs result.
-
-## Data model (Lovable Cloud / Postgres)
-
-```text
-states(id, code, name)
-counties(id, state_id, name, fips)
-cities(id, county_id, name)
-
-library_systems(
-  id, slug, name, jurisdiction_type, -- 'city'|'county'|'consortium'|'state'
-  primary_state_id, primary_county_id,
-  website, apply_url, online_signup, fee_cents, fee_notes,
-  description, last_verified_at, confidence_score, created_at, updated_at
-)
-
-eligibility_rules(
-  id, library_system_id,
-  rule_type, -- 'resident_of_county'|'resident_of_city'|'resident_of_state'|'us_resident'|'property_owner'|'student'|'educator'|'employee'|'reciprocal'
-  scope_state_id, scope_county_id, scope_city_id,
-  requires_in_person, paid, fee_cents, notes
-)
-
-benefits(id, slug, name, category, icon, description)
--- categories: streaming, ebooks, audiobooks, learning, news, museum, languages, career, makerspace
-
-library_benefits(
-  library_system_id, benefit_id,
-  limit_text, -- e.g. "10 plays/month"
-  notes,
-  PRIMARY KEY(library_system_id, benefit_id)
-)
-
-reciprocity(library_system_id, reciprocal_with_id, notes)
-
-profiles(id, email, display_name, role) -- role via separate user_roles table
-user_roles(user_id, role) -- 'admin'|'user', SECURITY DEFINER has_role()
-favorites(user_id, library_system_id, created_at)
-suggested_corrections(id, library_system_id, submitter_email, field, suggested_value, status, created_at)
-scrape_jobs(id, library_system_id, status, started_at, finished_at, diff_json, error)
-```
-
-RLS: public read on libraries/eligibility/benefits/reciprocity. `favorites` and `suggested_corrections` user-scoped. Admin tables gated by `has_role(auth.uid(),'admin')`.
-
-## Eligibility engine
-
-A pure TS module `src/lib/eligibility.ts` (called by a `createServerFn`) takes the survey answers and returns each library bucketed into one of the 5 categories above. Rules are evaluated in priority order; reciprocity expanded transitively one hop. Pure function = trivially testable and reusable when we add states.
-
-## Seeded California data (12 systems)
-
-LAPL, LA County, SFPL, Oakland, Berkeley, Pasadena, San Diego, San Jose, Santa Clara County, Sacramento, Contra Costa County, Alameda County — each with real eligibility rules, fees (where applicable for non-residents), and benefit mapping (Kanopy, Hoopla, Libby/OverDrive, LinkedIn Learning, Mango, NYT, Consumer Reports, museum passes where offered).
-
-## Scraping architecture (scaffold + honest note)
-
-- DB schema for `scrape_jobs` and admin trigger UI shipped now.
-- Server function stub that records a job and returns "manual verification required."
-- Real Playwright/Cheerio worker requires a separate Node host (Render/Fly/Railway cron) — out of scope for the edge runtime; documented in `/docs/scraping.md`.
-
-## Tech notes
-
-- TanStack Start (already in project) + TS + Tailwind v4 + shadcn/ui + Framer Motion + Lucide icons.
-- Lovable Cloud for Postgres, auth (email + Google), RLS, server functions.
-- Server functions for all DB reads (typed RPC); browser Supabase client only for auth/session.
-- Per-route `head()` for SEO; JSON-LD on detail and SEO pages; sitemap server route.
-- Monetization, premium tools, API access, newsletter — schema-friendly but no UI in MVP.
-
-## Deliverables checklist
-
-- [ ] Design tokens + Civic Trust theme in `src/styles.css`
-- [ ] Shared layout (header/footer) in `__root.tsx`
-- [ ] Routes: `/`, `/get-started`, `/results`, `/library/$slug`, `/compare`, `/favorites`, `/login`, `/admin`, 5 SEO pages, `/api/sitemap.xml`
-- [ ] DB migrations + RLS + `has_role` function
-- [ ] Seed 12 CA systems with eligibility + benefits
-- [ ] Eligibility engine + server functions
-- [ ] Survey, results, detail, compare, favorites UIs
-- [ ] Admin CRUD + corrections inbox + scrape-job stub
-- [ ] Auth (email + Google) with `_authenticated` layout
-- [ ] SEO meta + JSON-LD on detail and SEO pages
-- [ ] Dark mode toggle
-- [ ] README + `/docs/scraping.md`
-
-## Out of scope for this pass
-
-- Real headless-browser scraping (needs external worker)
-- Other 49 states (schema ready, data not seeded)
-- Payments, newsletter, public API
-- AI summarization (hook only)
-
-Approve and I'll build it.
+- Admin UI for triaging region requests (data is captured; UI ships with the broader admin dashboard).
+- Email notifications to requesters (DB has the field; wiring requires a transactional email provider — flagged for a later pass).
