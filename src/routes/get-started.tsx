@@ -67,12 +67,6 @@ function GetStartedPage() {
 
   function onSubmit(e: React.FormEvent) {
     e.preventDefault();
-    const params = new URLSearchParams();
-    if (stateId) params.set("state", stateId);
-    if (countyId) params.set("county", countyId);
-    if (resident) params.set("resident", "1");
-    if (propertyOwner) params.set("property", "1");
-    if (student) params.set("student", "1");
     navigate({
       to: "/results",
       search: {
