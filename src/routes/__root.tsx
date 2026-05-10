@@ -88,14 +88,16 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "Library Card Finder" },
-      { name: "description", content: "Discover every library card you qualify for and what each one unlocks." },
-      { property: "og:title", content: "Library Card Finder" },
-      { property: "og:description", content: "Discover every library card you qualify for and what each one unlocks." },
+      { title: "Library Access" },
+      { name: "description", content: "Single source of truth for local library benefits, with portal to determine eligibility and apply" },
+      { property: "og:title", content: "Library Access" },
+      { property: "og:description", content: "Single source of truth for local library benefits, with portal to determine eligibility and apply" },
       { property: "og:type", content: "website" },
-      { property: "og:image", content: "/og-library.jpg" },
+      { property: "og:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/db19dc16-f7a0-481e-b809-a687699c6d2e/id-preview-21f6433d--9fc52e83-99de-43c3-a8b4-f2a43fd88746.lovable.app-1778448750625.png" },
       { name: "twitter:card", content: "summary_large_image" },
-      { name: "twitter:image", content: "/og-library.jpg" },
+      { name: "twitter:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/db19dc16-f7a0-481e-b809-a687699c6d2e/id-preview-21f6433d--9fc52e83-99de-43c3-a8b4-f2a43fd88746.lovable.app-1778448750625.png" },
+      { name: "twitter:title", content: "Library Access" },
+      { name: "twitter:description", content: "Single source of truth for local library benefits, with portal to determine eligibility and apply" },
     ],
     links: [
       {
