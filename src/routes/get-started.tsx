@@ -31,6 +31,7 @@ type County = { id: string; name: string; state_id: string };
 
 function GetStartedPage() {
   const navigate = useNavigate();
+  const [mounted, setMounted] = useState(false);
   const [states, setStates] = useState<State[] | null>(null);
   const [counties, setCounties] = useState<County[]>([]);
   const [stateId, setStateId] = useState<string | undefined>(undefined);
@@ -41,12 +42,17 @@ function GetStartedPage() {
   const [loadingCounties, setLoadingCounties] = useState(false);
 
   useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  useEffect(() => {
+    if (!mounted) return;
     supabase.from("states").select("id,name,code").order("name").then(({ data }) => {
       setStates(data ?? []);
       const ca = (data ?? []).find((s) => s.code === "CA");
       if (ca) setStateId(ca.id);
     });
-  }, []);
+  }, [mounted]);
 
   useEffect(() => {
     if (!stateId) {
@@ -79,7 +85,7 @@ function GetStartedPage() {
     });
   }
 
-  if (!states) {
+  if (!mounted || !states) {
     return (
       <div className="flex min-h-[60vh] items-center justify-center text-muted-foreground">
         <Loader2 className="h-5 w-5 animate-spin" />
