@@ -31,22 +31,28 @@ type County = { id: string; name: string; state_id: string };
 
 function GetStartedPage() {
   const navigate = useNavigate();
+  const [mounted, setMounted] = useState(false);
   const [states, setStates] = useState<State[] | null>(null);
   const [counties, setCounties] = useState<County[]>([]);
-  const [stateId, setStateId] = useState<string>("");
-  const [countyId, setCountyId] = useState<string>("");
+  const [stateId, setStateId] = useState<string | undefined>(undefined);
+  const [countyId, setCountyId] = useState<string | undefined>(undefined);
   const [resident, setResident] = useState(true);
   const [propertyOwner, setPropertyOwner] = useState(false);
   const [student, setStudent] = useState(false);
   const [loadingCounties, setLoadingCounties] = useState(false);
 
   useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  useEffect(() => {
+    if (!mounted) return;
     supabase.from("states").select("id,name,code").order("name").then(({ data }) => {
       setStates(data ?? []);
       const ca = (data ?? []).find((s) => s.code === "CA");
       if (ca) setStateId(ca.id);
     });
-  }, []);
+  }, [mounted]);
 
   useEffect(() => {
     if (!stateId) {
@@ -67,16 +73,19 @@ function GetStartedPage() {
 
   function onSubmit(e: React.FormEvent) {
     e.preventDefault();
-    const params = new URLSearchParams();
-    if (stateId) params.set("state", stateId);
-    if (countyId) params.set("county", countyId);
-    if (resident) params.set("resident", "1");
-    if (propertyOwner) params.set("property", "1");
-    if (student) params.set("student", "1");
-    navigate({ to: "/results", search: Object.fromEntries(params) });
+    navigate({
+      to: "/results",
+      search: {
+        state: stateId ?? "",
+        county: countyId ?? "",
+        resident,
+        property: propertyOwner,
+        student,
+      },
+    });
   }
 
-  if (!states) {
+  if (!mounted || !states) {
     return (
       <div className="flex min-h-[60vh] items-center justify-center text-muted-foreground">
         <Loader2 className="h-5 w-5 animate-spin" />
@@ -98,7 +107,7 @@ function GetStartedPage() {
       <form onSubmit={onSubmit} className="mt-8 space-y-6">
         <div>
           <Label>State</Label>
-          <Select value={stateId} onValueChange={(v) => { setStateId(v); setCountyId(""); }}>
+          <Select value={stateId} onValueChange={(v) => { setStateId(v); setCountyId(undefined); }}>
             <SelectTrigger className="mt-1.5"><SelectValue placeholder="Choose a state" /></SelectTrigger>
             <SelectContent>
               {states.map((s) => (
