@@ -49,9 +49,9 @@ function ResultsPage() {
       const matchedSystemIds = new Set<string>();
       for (const r of rules ?? []) {
         if (r.rule_type === "us_resident") matchedSystemIds.add(r.library_system_id);
-        if (r.rule_type === "resident_state" && r.scope_state_id === state)
+        if (r.rule_type === "resident_of_state" && r.scope_state_id === state)
           matchedSystemIds.add(r.library_system_id);
-        if (r.rule_type === "resident_county" && resident && r.scope_county_id === county)
+        if (r.rule_type === "resident_of_county" && resident && r.scope_county_id === county)
           matchedSystemIds.add(r.library_system_id);
         if (r.rule_type === "property_owner" && property && r.scope_county_id === county)
           matchedSystemIds.add(r.library_system_id);
