@@ -1,0 +1,1 @@
+INSERT INTO public.counties (state_id, name) VALUES ('18d1e722-a9dd-4ac0-b694-67533d037506', 'Solano');
