@@ -41,17 +41,18 @@ function Index() {
               each one unlocks.
             </p>
             <div className="mt-8 flex flex-wrap gap-3">
-              <a
-                href="/get-started"
+              <Link
+                to="/get-started"
                 className="inline-flex items-center gap-2 rounded-md bg-primary px-5 py-3 text-sm font-medium text-primary-foreground shadow-sm transition hover:opacity-90"
               >
                 Find my library cards <ArrowRight className="h-4 w-4" />
-              </a>
+              </Link>
               <Link
-                to="/"
+                to="/login"
+                search={{ redirect: "/my-benefits", mode: "signin" }}
                 className="inline-flex items-center rounded-md border border-input bg-background px-5 py-3 text-sm font-medium text-foreground transition hover:bg-accent hover:text-accent-foreground"
               >
-                Browse benefits
+                Sign in
               </Link>
             </div>
             <p className="mt-6 text-sm text-muted-foreground">
@@ -125,12 +126,12 @@ function Index() {
             ))}
           </div>
           <div className="mt-10">
-            <a
-              href="/get-started"
+            <Link
+              to="/get-started"
               className="inline-flex items-center gap-2 rounded-md bg-primary px-5 py-3 text-sm font-medium text-primary-foreground"
             >
               Start the 30-second survey <ArrowRight className="h-4 w-4" />
-            </a>
+            </Link>
           </div>
         </div>
       </section>
