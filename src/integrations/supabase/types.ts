@@ -214,18 +214,21 @@ export type Database = {
           library_system_id: string
           limit_text: string | null
           notes: string | null
+          url: string | null
         }
         Insert: {
           benefit_id: string
           library_system_id: string
           limit_text?: string | null
           notes?: string | null
+          url?: string | null
         }
         Update: {
           benefit_id?: string
           library_system_id?: string
           limit_text?: string | null
           notes?: string | null
+          url?: string | null
         }
         Relationships: [
           {
