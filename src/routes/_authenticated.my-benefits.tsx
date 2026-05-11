@@ -294,7 +294,7 @@ function BenefitSection({
                   <tr>
                     <th className="px-4 py-2 font-medium">Library system</th>
                     <th className="px-4 py-2 font-medium">Per-card limit</th>
-                    <th className="px-4 py-2 font-medium">Notes</th>
+                    <th className="px-4 py-2 font-medium">Setup link</th>
                   </tr>
                 </thead>
                 <tbody>
