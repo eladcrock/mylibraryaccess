@@ -6,7 +6,7 @@ export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
       { title: "Library Card Finder — Discover every library card you qualify for" },
-      { name: "description", content: "Find every public library card you're eligible for in California. Compare Kanopy, Hoopla, Libby, LinkedIn Learning and more — free." },
+      { name: "description", content: "Find every public library card you're eligible for in California. Compare Kanopy, Hoopla, Libby, LinkedIn Learning and more, free." },
       { property: "og:title", content: "Library Card Finder" },
       { property: "og:description", content: "Discover every library card you qualify for and what each one unlocks." },
     ],
