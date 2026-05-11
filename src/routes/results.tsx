@@ -3,7 +3,8 @@ import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/use-auth";
 import { Button } from "@/components/ui/button";
-import { BookmarkCheck, BookmarkPlus, ExternalLink, Loader2 } from "lucide-react";
+import { BookmarkCheck, BookmarkPlus, ExternalLink, Loader2, Zap } from "lucide-react";
+import { toast } from "sonner";
 
 export const Route = createFileRoute("/results")({
   validateSearch: (s: Record<string, unknown>) => ({
@@ -38,6 +39,8 @@ function ResultsPage() {
   const [systems, setSystems] = useState<System[] | null>(null);
   const [favIds, setFavIds] = useState<Set<string>>(new Set());
   const [savingId, setSavingId] = useState<string | null>(null);
+  const [hasProfile, setHasProfile] = useState(false);
+  const [profileText, setProfileText] = useState<string>("");
 
   useEffect(() => {
     (async () => {
@@ -83,6 +86,51 @@ function ResultsPage() {
       .eq("user_id", user.id)
       .then(({ data }) => setFavIds(new Set((data ?? []).map((f) => f.library_system_id))));
   }, [user]);
+
+  useEffect(() => {
+    if (!user) {
+      setHasProfile(false);
+      setProfileText("");
+      return;
+    }
+    supabase
+      .from("applicant_profiles")
+      .select("*")
+      .eq("user_id", user.id)
+      .maybeSingle()
+      .then(({ data }) => {
+        if (!data) {
+          setHasProfile(false);
+          return;
+        }
+        setHasProfile(true);
+        const lines: string[] = [];
+        const fullName = [data.first_name, data.last_name].filter(Boolean).join(" ");
+        if (fullName) lines.push(`Name: ${fullName}`);
+        if (data.date_of_birth) lines.push(`Date of birth: ${data.date_of_birth}`);
+        if (data.email) lines.push(`Email: ${data.email}`);
+        if (data.phone) lines.push(`Phone: ${data.phone}`);
+        const addr = [
+          data.address_line1,
+          data.address_line2,
+          [data.city, data.state, data.postal_code].filter(Boolean).join(", "),
+        ].filter(Boolean).join("\n");
+        if (addr) lines.push(`Address:\n${addr}`);
+        setProfileText(lines.join("\n"));
+      });
+  }, [user]);
+
+  async function quickApply(url: string) {
+    try {
+      await navigator.clipboard.writeText(profileText);
+      toast.success("Your info is copied. Paste into the library form.");
+    } catch {
+      toast.message("Opening application", {
+        description: "Couldn't copy to clipboard automatically — copy from your profile page.",
+      });
+    }
+    window.open(url, "_blank", "noopener,noreferrer");
+  }
 
   async function toggleFavorite(systemId: string) {
     if (!user) return;
@@ -155,14 +203,24 @@ function ResultsPage() {
                   </div>
                   <div className="flex flex-wrap items-center gap-2">
                     {s.apply_url ? (
-                      <a
-                        href={s.apply_url}
-                        target="_blank"
-                        rel="noreferrer"
-                        className="inline-flex items-center gap-1 rounded-md bg-primary px-3 py-2 text-sm font-medium text-primary-foreground"
-                      >
-                        Apply <ExternalLink className="h-3 w-3" />
-                      </a>
+                      hasProfile && profileText ? (
+                        <button
+                          type="button"
+                          onClick={() => quickApply(s.apply_url!)}
+                          className="inline-flex items-center gap-1 rounded-md bg-primary px-3 py-2 text-sm font-medium text-primary-foreground"
+                        >
+                          <Zap className="h-3.5 w-3.5" /> Quick apply
+                        </button>
+                      ) : (
+                        <a
+                          href={s.apply_url}
+                          target="_blank"
+                          rel="noreferrer"
+                          className="inline-flex items-center gap-1 rounded-md bg-primary px-3 py-2 text-sm font-medium text-primary-foreground"
+                        >
+                          Apply <ExternalLink className="h-3 w-3" />
+                        </a>
+                      )
                     ) : null}
                     {user ? (
                       <Button
