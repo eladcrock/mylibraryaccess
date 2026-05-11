@@ -127,7 +127,7 @@ function MyBenefitsPage() {
       <h1 className="mt-2 font-display text-4xl text-foreground">My benefits</h1>
       <p className="mt-3 max-w-2xl text-muted-foreground">
         Every benefit unlocked by the library cards you've saved, with the per-card limits
-        side by side. The more cards you hold, the more you can borrow.
+        side by side. The more cards you hold, the more digital benefits you can access.
       </p>
       <p className="mt-3 max-w-2xl text-sm text-muted-foreground">
         These are the digital benefits we track. Visit each library's website or
