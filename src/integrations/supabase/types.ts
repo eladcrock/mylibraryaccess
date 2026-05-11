@@ -14,6 +14,54 @@ export type Database = {
   }
   public: {
     Tables: {
+      applicant_profiles: {
+        Row: {
+          address_line1: string | null
+          address_line2: string | null
+          city: string | null
+          created_at: string
+          date_of_birth: string | null
+          email: string | null
+          first_name: string | null
+          last_name: string | null
+          phone: string | null
+          postal_code: string | null
+          state: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          address_line1?: string | null
+          address_line2?: string | null
+          city?: string | null
+          created_at?: string
+          date_of_birth?: string | null
+          email?: string | null
+          first_name?: string | null
+          last_name?: string | null
+          phone?: string | null
+          postal_code?: string | null
+          state?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          address_line1?: string | null
+          address_line2?: string | null
+          city?: string | null
+          created_at?: string
+          date_of_birth?: string | null
+          email?: string | null
+          first_name?: string | null
+          last_name?: string | null
+          phone?: string | null
+          postal_code?: string | null
+          state?: string | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       benefits: {
         Row: {
           category: Database["public"]["Enums"]["benefit_category"]
