@@ -267,6 +267,16 @@ function BenefitSection({
                 <p className="text-xs uppercase tracking-wide text-muted-foreground">
                   {benefit.benefit_category}
                 </p>
+                {benefit.benefit_url && (
+                  <a
+                    href={benefit.benefit_url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="mt-1 inline-flex items-center gap-1 text-xs font-medium text-accent underline underline-offset-2 hover:opacity-80"
+                  >
+                    Visit {benefit.benefit_name} <ExternalLink className="h-3 w-3" />
+                  </a>
+                )}
               </div>
               <span className="rounded-full bg-accent/10 px-2.5 py-1 text-xs font-medium text-accent">
                 {systems.length} card{systems.length === 1 ? "" : "s"}
