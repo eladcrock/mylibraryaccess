@@ -8,6 +8,9 @@ export function SiteFooter() {
           <p>© {new Date().getFullYear()} Library Card Finder · Digital Access for All</p>
         </div>
         <nav className="flex flex-wrap items-center gap-x-5 gap-y-2">
+          <Link to="/about" className="hover:text-foreground">
+            About & mission
+          </Link>
           <Link to="/request-region" className="hover:text-foreground">
             Request a region
           </Link>
