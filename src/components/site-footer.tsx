@@ -5,7 +5,7 @@ export function SiteFooter() {
     <footer className="border-t border-border/60 bg-paper/40">
       <div className="mx-auto flex max-w-6xl flex-col gap-4 px-4 py-8 text-sm text-muted-foreground sm:flex-row sm:items-center sm:justify-between">
         <div className="space-y-1">
-          <p>© {new Date().getFullYear()} Library Card Finder · Civic-tech for readers.</p>
+          <p>© {new Date().getFullYear()} Library Card Finder · Digital Access for All</p>
           <p>Starting with California · Expanding nationwide</p>
         </div>
         <nav className="flex flex-wrap items-center gap-x-5 gap-y-2">
