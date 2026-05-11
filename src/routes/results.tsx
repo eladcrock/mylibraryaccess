@@ -183,6 +183,11 @@ function ResultsPage() {
           </>
         )}
       </p>
+      <p className="mt-2 text-sm text-muted-foreground">
+        These results show digital benefits. Visit each library's website or a
+        branch in person for events, Library of Things, museum passes, classes,
+        and more.
+      </p>
 
       {systems.length === 0 ? (
         <div className="mt-8 rounded-xl border border-dashed border-border bg-paper/40 p-8 text-center">
