@@ -160,8 +160,8 @@ function AboutPage() {
         </p>
         <figure className="mt-12 border-t border-border pt-8 text-center">
           <blockquote className="text-base italic text-muted-foreground">
-            In loving memory of Inez Diaz Owen — a champion of libraries who
-            taught us the quiet power of resourcefulness.
+            In loving memory of Inez Diaz Owen — a fierce champion of libraries
+            who taught us the bold art of resourcefulness.
           </blockquote>
         </figure>
       </div>
