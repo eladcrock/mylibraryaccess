@@ -9,8 +9,9 @@ import { defineConfig as defineLovableConfig } from "@lovable.dev/vite-tanstack-
 
 const isNetlify = process.env.NETLIFY === "true";
 const isVercel = process.env.VERCEL === "1" || process.env.VERCEL === "true";
+type TanStackStartOptions = NonNullable<Parameters<typeof tanstackStart>[0]>;
 
-const tanstackStartOptions = {
+const tanstackStartOptions: TanStackStartOptions = {
   importProtection: {
     behavior: "error",
     client: {
@@ -19,7 +20,7 @@ const tanstackStartOptions = {
     },
   },
   server: { entry: "server" },
-} as const;
+};
 
 const sharedExternalConfig = {
   resolve: {
