@@ -4,6 +4,39 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/use-auth";
 import { Loader2, BookmarkPlus } from "lucide-react";
 
+const DIGITAL_CATEGORIES = new Set([
+  "streaming",
+  "ebooks",
+  "learning",
+  "news",
+  "languages",
+  "research",
+  "career",
+]);
+
+function Linkified({ text }: { text: string }) {
+  const parts = text.split(/(https?:\/\/[^\s)]+)/g);
+  return (
+    <>
+      {parts.map((part, i) =>
+        /^https?:\/\//.test(part) ? (
+          <a
+            key={i}
+            href={part}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-accent underline underline-offset-2 hover:opacity-80 break-words"
+          >
+            {part}
+          </a>
+        ) : (
+          <span key={i}>{part}</span>
+        ),
+      )}
+    </>
+  );
+}
+
 export const Route = createFileRoute("/_authenticated/my-benefits")({
   head: () => ({
     meta: [
@@ -105,6 +138,15 @@ function MyBenefitsPage() {
     );
   }, [rows]);
 
+  const digitalGroups = useMemo(
+    () => grouped?.filter((g) => DIGITAL_CATEGORIES.has(g.benefit.benefit_category)) ?? [],
+    [grouped],
+  );
+  const inPersonGroups = useMemo(
+    () => grouped?.filter((g) => !DIGITAL_CATEGORIES.has(g.benefit.benefit_category)) ?? [],
+    [grouped],
+  );
+
   if (error) {
     return (
       <div className="mx-auto max-w-3xl px-4 py-12 text-center">
@@ -150,62 +192,97 @@ function MyBenefitsPage() {
           </Link>
         </div>
       ) : (
-        <div className="mt-10 space-y-6">
-          {grouped!.map(({ benefit, systems }) => (
-            <section
-              key={benefit.benefit_id}
-              className="rounded-xl border border-border bg-card p-5 sm:p-6"
-            >
-              <header className="flex items-baseline justify-between gap-4">
-                <div>
-                  <h3 className="font-display text-xl text-foreground">{benefit.benefit_name}</h3>
-                  <p className="text-xs uppercase tracking-wide text-muted-foreground">
-                    {benefit.benefit_category}
-                  </p>
-                </div>
-                <span className="rounded-full bg-accent/10 px-2.5 py-1 text-xs font-medium text-accent">
-                  {systems.length} card{systems.length === 1 ? "" : "s"}
-                </span>
-              </header>
-              {benefit.benefit_description && (
-                <p className="mt-2 text-sm text-muted-foreground">
-                  {benefit.benefit_description}
-                </p>
-              )}
-
-              <div className="mt-4 overflow-hidden rounded-lg border border-border/60">
-                <table className="w-full text-sm">
-                  <thead className="bg-paper/60 text-left text-xs uppercase tracking-wide text-muted-foreground">
-                    <tr>
-                      <th className="px-4 py-2 font-medium">Library system</th>
-                      <th className="px-4 py-2 font-medium">Per-card limit</th>
-                      <th className="px-4 py-2 font-medium">Notes</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {systems
-                      .slice()
-                      .sort((a, b) => a.library_system_name.localeCompare(b.library_system_name))
-                      .map((s) => (
-                        <tr key={s.library_system_id} className="border-t border-border/60">
-                          <td className="px-4 py-3 font-medium text-foreground">
-                            {s.library_system_name}
-                          </td>
-                          <td className="px-4 py-3 text-foreground">
-                            {s.limit_text ?? <span className="text-muted-foreground">No limit listed</span>}
-                          </td>
-                          <td className="px-4 py-3 text-muted-foreground">
-                            {s.notes ?? "-"}
-                          </td>
-                        </tr>
-                      ))}
-                  </tbody>
-                </table>
-              </div>
-            </section>
-          ))}
+        <div className="mt-10 space-y-12">
+          {digitalGroups.length > 0 && (
+            <BenefitSection
+              title="Digital benefits"
+              subtitle="Use these from anywhere with your library card."
+              groups={digitalGroups}
+            />
+          )}
+          {inPersonGroups.length > 0 && (
+            <BenefitSection
+              title="In-person resources"
+              subtitle="Visit a branch to borrow, book, or use these in person."
+              groups={inPersonGroups}
+            />
+          )}
         </div>
       )}
+    </div>
+  );
+}
+
+function BenefitSection({
+  title,
+  subtitle,
+  groups,
+}: {
+  title: string;
+  subtitle: string;
+  groups: { benefit: Row; systems: Row[] }[];
+}) {
+  return (
+    <div>
+      <div className="border-b border-border pb-3">
+        <h2 className="font-display text-2xl text-foreground">{title}</h2>
+        <p className="mt-1 text-sm text-muted-foreground">{subtitle}</p>
+      </div>
+      <div className="mt-6 space-y-6">
+        {groups.map(({ benefit, systems }) => (
+          <section
+            key={benefit.benefit_id}
+            className="rounded-xl border border-border bg-card p-5 sm:p-6"
+          >
+            <header className="flex items-baseline justify-between gap-4">
+              <div>
+                <h3 className="font-display text-xl text-foreground">{benefit.benefit_name}</h3>
+                <p className="text-xs uppercase tracking-wide text-muted-foreground">
+                  {benefit.benefit_category}
+                </p>
+              </div>
+              <span className="rounded-full bg-accent/10 px-2.5 py-1 text-xs font-medium text-accent">
+                {systems.length} card{systems.length === 1 ? "" : "s"}
+              </span>
+            </header>
+            {benefit.benefit_description && (
+              <p className="mt-2 text-sm text-muted-foreground">
+                {benefit.benefit_description}
+              </p>
+            )}
+
+            <div className="mt-4 overflow-hidden rounded-lg border border-border/60">
+              <table className="w-full text-sm">
+                <thead className="bg-paper/60 text-left text-xs uppercase tracking-wide text-muted-foreground">
+                  <tr>
+                    <th className="px-4 py-2 font-medium">Library system</th>
+                    <th className="px-4 py-2 font-medium">Per-card limit</th>
+                    <th className="px-4 py-2 font-medium">Notes</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {systems
+                    .slice()
+                    .sort((a, b) => a.library_system_name.localeCompare(b.library_system_name))
+                    .map((s) => (
+                      <tr key={s.library_system_id} className="border-t border-border/60">
+                        <td className="px-4 py-3 font-medium text-foreground">
+                          {s.library_system_name}
+                        </td>
+                        <td className="px-4 py-3 text-foreground">
+                          {s.limit_text ?? <span className="text-muted-foreground">No limit listed</span>}
+                        </td>
+                        <td className="px-4 py-3 text-muted-foreground">
+                          {s.notes ? <Linkified text={s.notes} /> : "-"}
+                        </td>
+                      </tr>
+                    ))}
+                </tbody>
+              </table>
+            </div>
+          </section>
+        ))}
+      </div>
     </div>
   );
 }
