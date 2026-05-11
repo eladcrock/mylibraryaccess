@@ -40,18 +40,20 @@ function Linkified({ text }: { text: string }) {
 function NotesCell({ row }: { row: Row }) {
   // Strip any URL already inside notes — we render it as a separate link below.
   const noteText = row.notes?.replace(/https?:\/\/[^\s)]+/g, "").replace(/\s+/g, " ").trim() ?? "";
-  if (!noteText && !row.url) return <>-</>;
+  const fallback = row.url ?? row.library_website ?? null;
+  if (!noteText && !fallback) return <>-</>;
   return (
     <div className="space-y-1">
       {noteText && <div>{noteText}</div>}
-      {row.url && (
+      {fallback && (
         <a
-          href={row.url}
+          href={fallback}
           target="_blank"
           rel="noopener noreferrer"
           className="inline-flex items-center gap-1 font-medium text-accent underline underline-offset-2 hover:opacity-80"
         >
-          How to get started <ExternalLink className="h-3 w-3" />
+          {row.url ? "How to get started" : `Visit ${row.library_system_name}`}
+          <ExternalLink className="h-3 w-3" />
         </a>
       )}
     </div>
