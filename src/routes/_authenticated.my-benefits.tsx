@@ -60,6 +60,10 @@ function NotesCell({ row }: { row: Row }) {
   );
 }
 
+function stripLibrary(name: string) {
+  return name.replace(/\s*\bLibrary\b\s*/gi, " ").replace(/\s+/g, " ").trim();
+}
+
 function MobileLinkButton({ row }: { row: Row }) {
   const fallback = row.url ?? row.library_website ?? null;
   if (!fallback) return null;
@@ -323,7 +327,7 @@ function BenefitSection({
                     .map((s) => (
                       <tr key={s.library_system_id} className="border-t border-border/60">
                         <td className="px-4 py-3 font-medium text-foreground">
-                          {s.library_system_name}
+                          {stripLibrary(s.library_system_name)}
                         </td>
                         <td className="px-4 py-3 text-foreground">
                           {s.limit_text ?? <span className="text-muted-foreground">No limit listed</span>}
@@ -345,7 +349,7 @@ function BenefitSection({
                     <li key={s.library_system_id} className="flex items-center justify-between gap-3 px-4 py-3">
                       <div className="min-w-0 flex-1">
                         <div className="truncate font-medium text-foreground">
-                          {s.library_system_name}
+                          {stripLibrary(s.library_system_name)}
                         </div>
                         <div className="text-xs text-muted-foreground">
                           {s.limit_text ?? "No limit listed"}
