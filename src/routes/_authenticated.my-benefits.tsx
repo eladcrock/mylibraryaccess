@@ -317,7 +317,7 @@ function BenefitSection({
           >
             <header className="flex items-baseline justify-between gap-4">
               <div>
-                <h3 className="font-display text-xl font-bold text-foreground">{benefit.benefit_name}</h3>
+                <h3 className="font-display text-xl text-foreground">{benefit.benefit_name}</h3>
                 <p className="text-xs uppercase tracking-wide text-muted-foreground">
                   {benefit.benefit_category}
                 </p>
