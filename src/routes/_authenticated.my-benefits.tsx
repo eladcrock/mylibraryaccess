@@ -3,6 +3,8 @@ import { useEffect, useMemo, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/use-auth";
 import { Loader2, BookmarkPlus, ExternalLink, ArrowUpRight } from "lucide-react";
+import bannerDigital from "@/assets/banner-digital.jpg";
+import bannerInPerson from "@/assets/banner-inperson.jpg";
 
 const DIGITAL_CATEGORIES = new Set([
   "streaming",
@@ -259,6 +261,7 @@ function MyBenefitsPage() {
               title="Digital benefits"
               subtitle="Use these from anywhere with your library card."
               groups={digitalGroups}
+              banner={bannerDigital}
             />
           )}
           {inPersonGroups.length > 0 && (
@@ -266,6 +269,7 @@ function MyBenefitsPage() {
               title="In-person resources"
               subtitle="Visit a branch to borrow, book, or use these in person."
               groups={inPersonGroups}
+              banner={bannerInPerson}
             />
           )}
         </div>
@@ -278,16 +282,32 @@ function BenefitSection({
   title,
   subtitle,
   groups,
+  banner,
 }: {
   title: string;
   subtitle: string;
   groups: { benefit: Row; systems: Row[] }[];
+  banner?: string;
 }) {
   return (
     <div>
-      <div className="border-b border-border pb-3">
-        <h2 className="font-display text-2xl text-foreground">{title}</h2>
-        <p className="mt-1 text-sm text-muted-foreground">{subtitle}</p>
+      <div
+        className="relative overflow-hidden rounded-xl border border-border"
+        style={
+          banner
+            ? {
+                backgroundImage: `url(${banner})`,
+                backgroundSize: "cover",
+                backgroundPosition: "center",
+              }
+            : undefined
+        }
+      >
+        <div className="absolute inset-0 bg-gradient-to-r from-background/90 via-background/70 to-background/40" />
+        <div className="relative px-5 py-6 sm:px-6 sm:py-8">
+          <h2 className="font-display text-2xl text-foreground drop-shadow-sm">{title}</h2>
+          <p className="mt-1 text-sm text-foreground/80">{subtitle}</p>
+        </div>
       </div>
       <div className="mt-6 space-y-6">
         {groups.map(({ benefit, systems }) => (
