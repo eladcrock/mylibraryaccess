@@ -1,5 +1,5 @@
 import { Link, useNavigate } from "@tanstack/react-router";
-import { Library, LogOut } from "lucide-react";
+import { Library, LogOut, Plus } from "lucide-react";
 import { useAuth } from "@/hooks/use-auth";
 import { supabase } from "@/integrations/supabase/client";
 
@@ -14,38 +14,44 @@ export function SiteHeader() {
 
   return (
     <header className="sticky top-0 z-40 border-b border-border/60 bg-background/80 backdrop-blur">
-      <div className="mx-auto flex h-16 max-w-6xl items-center justify-between gap-4 px-4">
+      <div className="mx-auto flex h-16 max-w-6xl items-center justify-between gap-3 px-4">
         <Link to="/" className="flex items-center gap-2">
           <span className="flex h-9 w-9 items-center justify-center rounded-lg gradient-civic text-primary-foreground">
             <Library className="h-5 w-5" />
           </span>
-          <span className="font-display text-lg leading-none">
+          <span className="font-display text-lg leading-none hidden xs:inline sm:inline">
             Library Card Finder
           </span>
         </Link>
-        <nav className="hidden items-center gap-6 text-sm text-muted-foreground sm:flex">
-          <Link to="/" activeProps={{ className: "text-foreground" }} className="hover:text-foreground">
+        <nav className="flex flex-1 items-center justify-center gap-1 text-sm text-muted-foreground sm:gap-4">
+          <Link
+            to="/"
+            activeOptions={{ exact: true }}
+            activeProps={{ className: "text-foreground font-medium" }}
+            className="rounded-md px-2 py-1.5 hover:text-foreground"
+          >
             Home
           </Link>
-          <Link to="/get-started" activeProps={{ className: "text-foreground" }} className="hover:text-foreground">
-            Find my cards
+          <Link
+            to="/get-started"
+            activeProps={{ className: "text-foreground font-medium" }}
+            className="rounded-md px-2 py-1.5 hover:text-foreground"
+          >
+            {user ? "Find more cards" : "Find my cards"}
           </Link>
           {user ? (
-            <Link to="/my-benefits" activeProps={{ className: "text-foreground" }} className="hover:text-foreground">
+            <Link
+              to="/my-benefits"
+              activeProps={{ className: "text-foreground font-medium" }}
+              className="rounded-md px-2 py-1.5 hover:text-foreground"
+            >
               My benefits
             </Link>
           ) : null}
         </nav>
         <div className="flex items-center gap-2">
           {loading ? null : user ? (
-            <>
-              <Link
-                to="/my-benefits"
-                className="hidden rounded-md border border-input px-3 py-2 text-sm font-medium text-foreground hover:bg-accent/10 sm:inline-flex"
-              >
-                My benefits
-              </Link>
-              <button
+            <button
                 type="button"
                 onClick={signOut}
                 className="inline-flex items-center gap-1 rounded-md px-3 py-2 text-sm text-muted-foreground hover:text-foreground"
@@ -54,7 +60,6 @@ export function SiteHeader() {
                 <LogOut className="h-4 w-4" />
                 <span className="hidden sm:inline">Sign out</span>
               </button>
-            </>
           ) : (
             <>
               <Link
