@@ -39,6 +39,14 @@ export function SiteHeader() {
       >
         {user ? "Find more cards" : "Find my cards"}
       </Link>
+      <Link
+        to="/about"
+        activeProps={activeProps}
+        className={navLinkClass}
+        onClick={() => setOpen(false)}
+      >
+        About
+      </Link>
       {user ? (
         <>
           <Link
