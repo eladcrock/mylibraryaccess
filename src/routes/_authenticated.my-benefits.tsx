@@ -2,7 +2,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useMemo, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/use-auth";
-import { Loader2, BookmarkPlus, ExternalLink } from "lucide-react";
+import { Loader2, BookmarkPlus, ExternalLink, ArrowUpRight } from "lucide-react";
 
 const DIGITAL_CATEGORIES = new Set([
   "streaming",
@@ -57,6 +57,22 @@ function NotesCell({ row }: { row: Row }) {
         </a>
       )}
     </div>
+  );
+}
+
+function MobileLinkButton({ row }: { row: Row }) {
+  const fallback = row.url ?? row.library_website ?? null;
+  if (!fallback) return null;
+  return (
+    <a
+      href={fallback}
+      target="_blank"
+      rel="noopener noreferrer"
+      aria-label={row.url ? "Learn more" : `Visit ${row.library_system_name}`}
+      className="inline-flex h-8 w-8 items-center justify-center rounded-md border border-border text-accent hover:bg-accent/10"
+    >
+      <ArrowUpRight className="h-4 w-4" />
+    </a>
   );
 }
 
@@ -291,7 +307,8 @@ function BenefitSection({
             )}
 
             <div className="mt-4 overflow-hidden rounded-lg border border-border/60">
-              <table className="w-full text-sm">
+              {/* Desktop / tablet table */}
+              <table className="hidden w-full text-sm sm:table">
                 <thead className="bg-paper/60 text-left text-xs uppercase tracking-wide text-muted-foreground">
                   <tr>
                     <th className="px-4 py-2 font-medium">Library system</th>
@@ -312,12 +329,32 @@ function BenefitSection({
                           {s.limit_text ?? <span className="text-muted-foreground">No limit listed</span>}
                         </td>
                         <td className="px-4 py-3 text-muted-foreground">
-                            <NotesCell row={s} />
+                          <NotesCell row={s} />
                         </td>
                       </tr>
                     ))}
                 </tbody>
               </table>
+
+              {/* Mobile stacked list */}
+              <ul className="divide-y divide-border/60 sm:hidden">
+                {systems
+                  .slice()
+                  .sort((a, b) => a.library_system_name.localeCompare(b.library_system_name))
+                  .map((s) => (
+                    <li key={s.library_system_id} className="flex items-center justify-between gap-3 px-4 py-3">
+                      <div className="min-w-0 flex-1">
+                        <div className="truncate font-medium text-foreground">
+                          {s.library_system_name}
+                        </div>
+                        <div className="text-xs text-muted-foreground">
+                          {s.limit_text ?? "No limit listed"}
+                        </div>
+                      </div>
+                      <MobileLinkButton row={s} />
+                    </li>
+                  ))}
+              </ul>
             </div>
           </section>
         ))}
