@@ -1,15 +1,58 @@
-// @lovable.dev/vite-tanstack-config already includes the following — do NOT add them manually
-// or the app will break with duplicate plugins:
-//   - tanstackStart, viteReact, tailwindcss, tsConfigPaths, cloudflare (build-only),
-//     componentTagger (dev-only), VITE_* env injection, @ path alias, React/TanStack dedupe,
-//     error logger plugins, and sandbox detection (port/host/strictPort).
-// You can pass additional config via defineConfig({ vite: { ... } }) if needed.
-import { defineConfig } from "@lovable.dev/vite-tanstack-config";
+import netlify from "@netlify/vite-plugin-tanstack-start";
+import tailwindcss from "@tailwindcss/vite";
+import { tanstackStart } from "@tanstack/react-start/plugin/vite";
+import viteReact from "@vitejs/plugin-react";
+import { nitro } from "nitro/vite";
+import { defineConfig as defineViteConfig } from "vite";
+import tsConfigPaths from "vite-tsconfig-paths";
+import { defineConfig as defineLovableConfig } from "@lovable.dev/vite-tanstack-config";
 
-// Redirect TanStack Start's bundled server entry to src/server.ts (our SSR error wrapper).
-// @cloudflare/vite-plugin builds from this — wrangler.jsonc main alone is insufficient.
-export default defineConfig({
+const isNetlify = process.env.NETLIFY === "true";
+const isVercel = process.env.VERCEL === "1" || process.env.VERCEL === "true";
+
+const tanstackStartOptions = {
+  importProtection: {
+    behavior: "error",
+    client: {
+      files: ["**/server/**"],
+      specifiers: ["server-only"],
+    },
+  },
+  server: { entry: "server" },
+} as const;
+
+const sharedExternalConfig = {
+  resolve: {
+    alias: { "@": `${process.cwd()}/src` },
+    dedupe: [
+      "react",
+      "react-dom",
+      "react/jsx-runtime",
+      "react/jsx-dev-runtime",
+      "@tanstack/react-query",
+      "@tanstack/query-core",
+    ],
+  },
+};
+
+const externalPlugins = [
+  tailwindcss(),
+  tsConfigPaths({ projects: ["./tsconfig.json"] }),
+  tanstackStart(tanstackStartOptions),
+  ...(isNetlify ? [netlify()] : []),
+  ...(isVercel ? nitro({ preset: "vercel" }) : []),
+  viteReact(),
+];
+
+const config = isNetlify || isVercel
+  ? defineViteConfig({
+      ...sharedExternalConfig,
+      plugins: externalPlugins,
+    })
+  : defineLovableConfig({
   tanstackStart: {
     server: { entry: "server" },
   },
 });
+
+export default config;
