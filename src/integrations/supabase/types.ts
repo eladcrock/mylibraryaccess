@@ -70,6 +70,7 @@ export type Database = {
           id: string
           name: string
           slug: string
+          url: string | null
         }
         Insert: {
           category: Database["public"]["Enums"]["benefit_category"]
@@ -78,6 +79,7 @@ export type Database = {
           id?: string
           name: string
           slug: string
+          url?: string | null
         }
         Update: {
           category?: Database["public"]["Enums"]["benefit_category"]
@@ -86,6 +88,7 @@ export type Database = {
           id?: string
           name?: string
           slug?: string
+          url?: string | null
         }
         Relationships: []
       }
