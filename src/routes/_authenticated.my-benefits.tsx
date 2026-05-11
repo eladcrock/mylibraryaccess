@@ -129,6 +129,11 @@ function MyBenefitsPage() {
         Every benefit unlocked by the library cards you've saved, with the per-card limits
         side by side. The more cards you hold, the more you can borrow.
       </p>
+      <p className="mt-3 max-w-2xl text-sm text-muted-foreground">
+        These are the digital benefits we track. Visit each library's website or
+        a branch in person to discover events, the Library of Things, museum
+        passes, classes, and much more.
+      </p>
 
       {rows.length === 0 ? (
         <div className="mt-10 rounded-xl border border-dashed border-border bg-paper/40 p-10 text-center">
