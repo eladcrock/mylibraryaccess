@@ -2,7 +2,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useMemo, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/use-auth";
-import { Loader2, BookmarkPlus } from "lucide-react";
+import { Loader2, BookmarkPlus, ExternalLink } from "lucide-react";
 
 const DIGITAL_CATEGORIES = new Set([
   "streaming",
@@ -40,19 +40,18 @@ function Linkified({ text }: { text: string }) {
 function NotesCell({ row }: { row: Row }) {
   // Strip any URL already inside notes — we render it as a separate link below.
   const noteText = row.notes?.replace(/https?:\/\/[^\s)]+/g, "").replace(/\s+/g, " ").trim() ?? "";
-  const link = row.url ?? row.library_website ?? null;
-  if (!noteText && !link) return <>-</>;
+  if (!noteText && !row.url) return <>-</>;
   return (
     <div className="space-y-1">
       {noteText && <div>{noteText}</div>}
-      {link && (
+      {row.url && (
         <a
-          href={link}
+          href={row.url}
           target="_blank"
           rel="noopener noreferrer"
-          className="inline-flex items-center gap-1 text-accent underline underline-offset-2 hover:opacity-80"
+          className="inline-flex items-center gap-1 font-medium text-accent underline underline-offset-2 hover:opacity-80"
         >
-          {row.url ? "Open ↗" : `Visit ${row.library_system_name} ↗`}
+          How to get started <ExternalLink className="h-3 w-3" />
         </a>
       )}
     </div>
@@ -75,6 +74,7 @@ type Row = {
   benefit_name: string;
   benefit_category: string;
   benefit_description: string | null;
+  benefit_url: string | null;
   library_system_id: string;
   library_system_name: string;
   library_system_slug: string;
@@ -115,7 +115,7 @@ function MyBenefitsPage() {
             .from("library_benefits")
             .select("library_system_id,benefit_id,limit_text,notes,url")
             .in("library_system_id", ids),
-          supabase.from("benefits").select("id,name,category,description"),
+          supabase.from("benefits").select("id,name,category,description,url"),
         ]);
 
       if (sErr || lbErr || bErr) {
@@ -134,6 +134,7 @@ function MyBenefitsPage() {
           benefit_name: ben.name,
           benefit_category: ben.category,
           benefit_description: (ben as { description?: string | null }).description ?? null,
+          benefit_url: (ben as { url?: string | null }).url ?? null,
           library_system_id: sys.id,
           library_system_name: sys.name,
           library_system_slug: sys.slug,
