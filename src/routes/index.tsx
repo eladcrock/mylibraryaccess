@@ -56,7 +56,7 @@ function Index() {
               </Link>
             </div>
             <p className="mt-6 text-sm text-muted-foreground">
-              Free · No account required · Updated regularly
+              Free · Account optional · Updated regularly
             </p>
           </div>
           <div className="relative hidden lg:block">
