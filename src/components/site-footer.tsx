@@ -1,6 +1,8 @@
-import { Link } from "@tanstack/react-router";
+import { Link, useLocation } from "@tanstack/react-router";
 
 export function SiteFooter() {
+  const { pathname } = useLocation();
+  const isAbout = pathname === "/about";
   return (
     <footer className="border-t border-border/60 bg-paper/40">
       <div className="mx-auto flex max-w-6xl flex-col gap-4 px-4 py-8 text-sm text-muted-foreground sm:flex-row sm:items-center sm:justify-between">
@@ -22,6 +24,12 @@ export function SiteFooter() {
           </Link>
         </nav>
       </div>
+      {!isAbout && (
+        <div className="mx-auto max-w-6xl px-4 pb-6 text-center text-xs italic text-muted-foreground/80">
+          In loving memory of Inez Diaz Owen — a fierce champion of libraries
+          who taught us the bold art of resourcefulness.
+        </div>
+      )}
     </footer>
   );
 }
