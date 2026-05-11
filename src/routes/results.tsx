@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/use-auth";
 import { Button } from "@/components/ui/button";
-import { BookmarkCheck, BookmarkPlus, ExternalLink, Loader2, Zap } from "lucide-react";
+import { BookmarkCheck, BookmarkPlus, ExternalLink, Loader2, Zap, UserPlus } from "lucide-react";
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/results")({
@@ -192,7 +192,30 @@ function ResultsPage() {
           </p>
         </div>
       ) : (
-        <ul className="mt-8 space-y-4">
+        <>
+          {user && !hasProfile ? (
+            <div className="mt-6 flex flex-wrap items-center justify-between gap-3 rounded-xl border border-accent/30 bg-accent/5 p-4">
+              <div className="flex items-start gap-3">
+                <Zap className="mt-0.5 h-5 w-5 shrink-0 text-accent" />
+                <div>
+                  <p className="text-sm font-medium text-foreground">
+                    Save your info for Quick apply
+                  </p>
+                  <p className="text-xs text-muted-foreground">
+                    Enter name, address, and contact details once. We'll copy them
+                    to your clipboard each time you open a library application.
+                  </p>
+                </div>
+              </div>
+              <Link
+                to="/profile"
+                className="inline-flex items-center gap-1 rounded-md bg-primary px-3 py-2 text-sm font-medium text-primary-foreground"
+              >
+                <UserPlus className="h-4 w-4" /> Save my info
+              </Link>
+            </div>
+          ) : null}
+          <ul className="mt-6 space-y-4">
           {systems.map((s) => {
             const isFav = favIds.has(s.id);
             return (
@@ -257,7 +280,8 @@ function ResultsPage() {
               </li>
             );
           })}
-        </ul>
+          </ul>
+        </>
       )}
     </div>
   );
