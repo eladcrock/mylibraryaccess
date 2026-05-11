@@ -37,6 +37,28 @@ function Linkified({ text }: { text: string }) {
   );
 }
 
+function NotesCell({ row }: { row: Row }) {
+  // Strip any URL already inside notes — we render it as a separate link below.
+  const noteText = row.notes?.replace(/https?:\/\/[^\s)]+/g, "").replace(/\s+/g, " ").trim() ?? "";
+  const link = row.url ?? row.library_website ?? null;
+  if (!noteText && !link) return <>-</>;
+  return (
+    <div className="space-y-1">
+      {noteText && <div>{noteText}</div>}
+      {link && (
+        <a
+          href={link}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="inline-flex items-center gap-1 text-accent underline underline-offset-2 hover:opacity-80"
+        >
+          {row.url ? "Open ↗" : `Visit ${row.library_system_name} ↗`}
+        </a>
+      )}
+    </div>
+  );
+}
+
 export const Route = createFileRoute("/_authenticated/my-benefits")({
   head: () => ({
     meta: [
@@ -58,6 +80,8 @@ type Row = {
   library_system_slug: string;
   limit_text: string | null;
   notes: string | null;
+  url: string | null;
+  library_website: string | null;
 };
 
 function MyBenefitsPage() {
@@ -86,10 +110,10 @@ function MyBenefitsPage() {
 
       const [{ data: systems, error: sErr }, { data: lbs, error: lbErr }, { data: benefits, error: bErr }] =
         await Promise.all([
-          supabase.from("library_systems").select("id,name,slug").in("id", ids),
+          supabase.from("library_systems").select("id,name,slug,website").in("id", ids),
           supabase
             .from("library_benefits")
-            .select("library_system_id,benefit_id,limit_text,notes")
+            .select("library_system_id,benefit_id,limit_text,notes,url")
             .in("library_system_id", ids),
           supabase.from("benefits").select("id,name,category,description"),
         ]);
@@ -115,6 +139,8 @@ function MyBenefitsPage() {
           library_system_slug: sys.slug,
           limit_text: lb.limit_text,
           notes: lb.notes,
+          url: (lb as { url?: string | null }).url ?? null,
+          library_website: (sys as { website?: string | null }).website ?? null,
         }];
       });
       if (!cancelled) setRows(out);
@@ -273,7 +299,7 @@ function BenefitSection({
                           {s.limit_text ?? <span className="text-muted-foreground">No limit listed</span>}
                         </td>
                         <td className="px-4 py-3 text-muted-foreground">
-                          {s.notes ? <Linkified text={s.notes} /> : "-"}
+                            <NotesCell row={s} />
                         </td>
                       </tr>
                     ))}
