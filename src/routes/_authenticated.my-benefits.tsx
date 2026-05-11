@@ -58,6 +58,8 @@ type Row = {
   library_system_slug: string;
   limit_text: string | null;
   notes: string | null;
+  url: string | null;
+  library_website: string | null;
 };
 
 function MyBenefitsPage() {
@@ -86,10 +88,10 @@ function MyBenefitsPage() {
 
       const [{ data: systems, error: sErr }, { data: lbs, error: lbErr }, { data: benefits, error: bErr }] =
         await Promise.all([
-          supabase.from("library_systems").select("id,name,slug").in("id", ids),
+          supabase.from("library_systems").select("id,name,slug,website").in("id", ids),
           supabase
             .from("library_benefits")
-            .select("library_system_id,benefit_id,limit_text,notes")
+            .select("library_system_id,benefit_id,limit_text,notes,url")
             .in("library_system_id", ids),
           supabase.from("benefits").select("id,name,category,description"),
         ]);
@@ -115,6 +117,8 @@ function MyBenefitsPage() {
           library_system_slug: sys.slug,
           limit_text: lb.limit_text,
           notes: lb.notes,
+          url: (lb as { url?: string | null }).url ?? null,
+          library_website: (sys as { website?: string | null }).website ?? null,
         }];
       });
       if (!cancelled) setRows(out);
