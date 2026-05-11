@@ -563,6 +563,8 @@ export type Database = {
         | "makerspace"
         | "research"
         | "music"
+        | "things"
+        | "space"
       correction_status: "pending" | "accepted" | "rejected"
       jurisdiction_type: "city" | "county" | "consortium" | "state"
       region_request_status: "new" | "reviewed" | "added" | "rejected"
@@ -718,6 +720,8 @@ export const Constants = {
         "makerspace",
         "research",
         "music",
+        "things",
+        "space",
       ],
       correction_status: ["pending", "accepted", "rejected"],
       jurisdiction_type: ["city", "county", "consortium", "state"],
