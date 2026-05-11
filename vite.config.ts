@@ -41,7 +41,7 @@ const externalPlugins = [
   tsConfigPaths({ projects: ["./tsconfig.json"] }),
   tanstackStart(tanstackStartOptions),
   ...(isNetlify ? [netlify()] : []),
-  ...(isVercel ? nitro({ preset: "vercel" }) : []),
+  ...(isVercel ? [nitro({ preset: "vercel" })] : []),
   viteReact(),
 ];
 
