@@ -317,7 +317,7 @@ function BenefitSection({
           >
             <header className="flex items-baseline justify-between gap-4">
               <div>
-                <h3 className="font-display text-xl text-foreground">{benefit.benefit_name}</h3>
+                <h3 className="font-display text-xl font-bold text-foreground">{benefit.benefit_name}</h3>
                 <p className="text-xs uppercase tracking-wide text-muted-foreground">
                   {benefit.benefit_category}
                 </p>
@@ -358,13 +358,13 @@ function BenefitSection({
                     .sort((a, b) => a.library_system_name.localeCompare(b.library_system_name))
                     .map((s) => (
                       <tr key={s.library_system_id} className="border-t border-border/60">
-                        <td className="px-4 py-3 font-medium text-foreground">
+                        <td className="px-3 py-2 text-[13px] font-light text-foreground">
                           {stripLibrary(s.library_system_name)}
                         </td>
-                        <td className="px-4 py-3 text-foreground">
+                        <td className="px-3 py-2 text-[13px] text-foreground">
                           {s.limit_text ?? <span className="text-muted-foreground">No limit listed</span>}
                         </td>
-                        <td className="px-4 py-3 text-muted-foreground">
+                        <td className="px-3 py-2 text-[13px] text-muted-foreground">
                           <NotesCell row={s} />
                         </td>
                       </tr>
@@ -378,12 +378,12 @@ function BenefitSection({
                   .slice()
                   .sort((a, b) => a.library_system_name.localeCompare(b.library_system_name))
                   .map((s) => (
-                    <li key={s.library_system_id} className="flex items-center justify-between gap-3 px-4 py-3">
+                    <li key={s.library_system_id} className="flex items-center justify-between gap-3 px-3 py-2">
                       <div className="min-w-0 flex-1">
-                        <div className="truncate font-medium text-foreground">
+                        <div className="truncate text-[13px] font-light text-foreground">
                           {stripLibrary(s.library_system_name)}
                         </div>
-                        <div className="text-xs text-muted-foreground">
+                        <div className="text-[11px] text-muted-foreground">
                           {s.limit_text ?? "No limit listed"}
                         </div>
                       </div>
