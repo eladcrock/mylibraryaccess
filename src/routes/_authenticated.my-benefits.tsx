@@ -37,6 +37,28 @@ function Linkified({ text }: { text: string }) {
   );
 }
 
+function NotesCell({ row }: { row: Row }) {
+  // Strip any URL already inside notes — we render it as a separate link below.
+  const noteText = row.notes?.replace(/https?:\/\/[^\s)]+/g, "").replace(/\s+/g, " ").trim() ?? "";
+  const link = row.url ?? row.library_website ?? null;
+  if (!noteText && !link) return <>-</>;
+  return (
+    <div className="space-y-1">
+      {noteText && <div>{noteText}</div>}
+      {link && (
+        <a
+          href={link}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="inline-flex items-center gap-1 text-accent underline underline-offset-2 hover:opacity-80"
+        >
+          {row.url ? "Open ↗" : `Visit ${row.library_system_name} ↗`}
+        </a>
+      )}
+    </div>
+  );
+}
+
 export const Route = createFileRoute("/_authenticated/my-benefits")({
   head: () => ({
     meta: [
