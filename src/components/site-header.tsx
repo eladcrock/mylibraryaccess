@@ -40,13 +40,22 @@ export function SiteHeader() {
             {user ? "Find more cards" : "Find my cards"}
           </Link>
           {user ? (
-            <Link
-              to="/my-benefits"
-              activeProps={{ className: "text-foreground font-medium" }}
-              className="rounded-md px-2 py-1.5 hover:text-foreground"
-            >
-              My benefits
-            </Link>
+            <>
+              <Link
+                to="/my-benefits"
+                activeProps={{ className: "text-foreground font-medium" }}
+                className="rounded-md px-2 py-1.5 hover:text-foreground"
+              >
+                My benefits
+              </Link>
+              <Link
+                to="/profile"
+                activeProps={{ className: "text-foreground font-medium" }}
+                className="rounded-md px-2 py-1.5 hover:text-foreground"
+              >
+                Profile
+              </Link>
+            </>
           ) : null}
         </nav>
         <div className="flex items-center gap-2">
