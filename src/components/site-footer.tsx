@@ -26,7 +26,7 @@ export function SiteFooter() {
       </div>
       {!isAbout && (
         <div className="mx-auto max-w-6xl px-4 pb-6 text-center text-xs italic text-muted-foreground/80">
-          In loving memory of Inez Diaz Owen — a fierce champion of libraries
+          In loving memory of Inez Diaz Owen; a fierce champion of libraries
           who taught us the bold art of resourcefulness.
         </div>
       )}
