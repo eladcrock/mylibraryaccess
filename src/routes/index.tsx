@@ -5,7 +5,7 @@ import { ArrowRight, BookOpen, Film, GraduationCap, Landmark, Newspaper, ShieldC
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "Library Card Finder — Discover every library card you qualify for" },
+      { title: "Library Card Finder - Discover every library card you qualify for" },
       { name: "description", content: "Find every public library card you're eligible for in California. Compare Kanopy, Hoopla, Libby, LinkedIn Learning and more, free." },
       { property: "og:title", content: "Library Card Finder" },
       { property: "og:description", content: "Discover every library card you qualify for and what each one unlocks." },
@@ -37,7 +37,7 @@ function Index() {
             </h1>
             <p className="mt-5 max-w-xl text-lg text-muted-foreground">
               Many California residents qualify for far more library cards than they realize.
-              Answer a few questions and we'll show you every card you can apply for — and what
+              Answer a few questions and we'll show you every card you can apply for - and what
               each one unlocks.
             </p>
             <div className="mt-8 flex flex-wrap gap-3">
@@ -92,7 +92,7 @@ function Index() {
       <section className="mx-auto max-w-6xl px-4 py-16">
         <h2 className="font-display text-3xl text-foreground">What library cards unlock</h2>
         <p className="mt-2 max-w-2xl text-muted-foreground">
-          Premium digital services worth hundreds of dollars per year — included with most cards.
+          Premium digital services worth hundreds of dollars per year - included with most cards.
         </p>
         <div className="mt-8 grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-6">
           {benefits.map(({ icon: Icon, name, desc }) => (

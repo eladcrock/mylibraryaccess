@@ -15,7 +15,7 @@ export const Route = createFileRoute("/results")({
   }),
   head: () => ({
     meta: [
-      { title: "Your eligible library cards — Library Card Finder" },
+      { title: "Your eligible library cards - Library Card Finder" },
       { name: "description", content: "Library cards you qualify for, based on where you live." },
     ],
   }),

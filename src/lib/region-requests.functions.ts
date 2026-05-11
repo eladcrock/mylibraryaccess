@@ -22,7 +22,7 @@ const schema = z.object({
     .optional()
     .or(z.literal("")),
   notes: z.string().trim().max(2000).optional().or(z.literal("")),
-  // honeypot — must be empty
+  // honeypot - must be empty
   website: z.string().max(0).optional().or(z.literal("")),
 });
 

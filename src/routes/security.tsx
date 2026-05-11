@@ -5,13 +5,13 @@ const LAST_UPDATED = "May 10, 2026";
 export const Route = createFileRoute("/security")({
   head: () => ({
     meta: [
-      { title: "Security — Library Card Finder" },
+      { title: "Security - Library Card Finder" },
       {
         name: "description",
         content:
           "How Library Card Finder secures your account and data: HTTPS, Row Level Security, encrypted backups, and responsible disclosure.",
       },
-      { property: "og:title", content: "Security — Library Card Finder" },
+      { property: "og:title", content: "Security - Library Card Finder" },
       {
         property: "og:description",
         content: "Our security posture in plain English.",
@@ -36,14 +36,14 @@ function SecurityPage() {
 
         <h2>In transit</h2>
         <ul>
-          <li>HTTPS everywhere — HTTP requests are redirected to TLS.</li>
+          <li>HTTPS everywhere - HTTP requests are redirected to TLS.</li>
           <li>HSTS is enabled on the production domain.</li>
         </ul>
 
         <h2>Authentication</h2>
         <ul>
           <li>Email + password and Google sign-in via our managed auth provider.</li>
-          <li>Passwords are hashed by the auth provider — we never see them.</li>
+          <li>Passwords are hashed by the auth provider - we never see them.</li>
           <li>
             New and changed passwords are checked against the Have I Been Pwned breach
             corpus and rejected if known to be compromised.
@@ -70,7 +70,7 @@ function SecurityPage() {
           <li>The eligibility survey runs in your browser. Answers stay local unless you save favorites.</li>
           <li>Region request emails are optional and stored only so we can notify you.</li>
           <li>IPs attached to form submissions are SHA-256 hashed before storage.</li>
-          <li>No payments, no SSNs, no document uploads — none are collected.</li>
+          <li>No payments, no SSNs, no document uploads - none are collected.</li>
         </ul>
 
         <h2>Storage and backups</h2>

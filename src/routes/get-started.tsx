@@ -16,7 +16,7 @@ import { Loader2 } from "lucide-react";
 export const Route = createFileRoute("/get-started")({
   head: () => ({
     meta: [
-      { title: "Find my library cards — Library Card Finder" },
+      { title: "Find my library cards - Library Card Finder" },
       {
         name: "description",
         content: "Answer a few quick questions and see every public library card you qualify for.",

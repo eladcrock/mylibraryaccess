@@ -5,13 +5,13 @@ const LAST_UPDATED = "May 10, 2026";
 export const Route = createFileRoute("/privacy")({
   head: () => ({
     meta: [
-      { title: "Privacy Policy — Library Card Finder" },
+      { title: "Privacy Policy - Library Card Finder" },
       {
         name: "description",
         content:
           "How Library Card Finder collects, uses, and protects your information. No ad tracking, no data sales.",
       },
-      { property: "og:title", content: "Privacy Policy — Library Card Finder" },
+      { property: "og:title", content: "Privacy Policy - Library Card Finder" },
       {
         property: "og:description",
         content: "Plain-English privacy policy for Library Card Finder.",
@@ -39,19 +39,19 @@ function PrivacyPage() {
         <h2>Information we collect</h2>
         <ul>
           <li>
-            <strong>Account info</strong> — if you sign up: your email address and, if
+            <strong>Account info</strong> - if you sign up: your email address and, if
             you sign in with Google, your name and avatar URL from your Google profile.
           </li>
           <li>
-            <strong>Saved favorites</strong> — the library systems you bookmark while
+            <strong>Saved favorites</strong> - the library systems you bookmark while
             signed in.
           </li>
           <li>
-            <strong>Suggested corrections</strong> — any edits you submit to library
+            <strong>Suggested corrections</strong> - any edits you submit to library
             data, optionally with an email so we can follow up.
           </li>
           <li>
-            <strong>Region requests</strong> — the region, library system, optional
+            <strong>Region requests</strong> - the region, library system, optional
             email, and notes you submit on the{" "}
             <Link to="/request-region" className="text-accent underline">
               Request a region
@@ -59,7 +59,7 @@ function PrivacyPage() {
             page.
           </li>
           <li>
-            <strong>Operational logs</strong> — standard server logs (IP address,
+            <strong>Operational logs</strong> - standard server logs (IP address,
             request path, timestamp, user agent) used to keep the service running and
             to prevent abuse. We hash IPs before storing them with form submissions.
           </li>
@@ -87,11 +87,11 @@ function PrivacyPage() {
         <h2>Third parties we rely on</h2>
         <ul>
           <li>
-            <strong>Lovable Cloud</strong> — hosts our database, authentication, and
+            <strong>Lovable Cloud</strong> - hosts our database, authentication, and
             server functions.
           </li>
           <li>
-            <strong>Google</strong> — only if you choose to sign in with Google. Google
+            <strong>Google</strong> - only if you choose to sign in with Google. Google
             sees that you used your account to sign in to Library Card Finder.
           </li>
         </ul>
