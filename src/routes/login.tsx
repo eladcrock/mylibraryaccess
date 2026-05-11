@@ -1,7 +1,6 @@
 import { createFileRoute, Link, useNavigate, useRouter } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
-import { lovable } from "@/integrations/lovable";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -37,27 +36,6 @@ function LoginPage() {
       if (data.session) navigate({ to: redirect });
     });
   }, [navigate, redirect]);
-
-  async function handleGoogle() {
-    setErr(null);
-    setBusy(true);
-    try {
-      const result = await lovable.auth.signInWithOAuth("google", {
-        redirect_uri: window.location.origin + redirect,
-      });
-      if (result.error) {
-        setErr(result.error.message ?? "Google sign-in failed.");
-        setBusy(false);
-        return;
-      }
-      if (result.redirected) return;
-      router.invalidate();
-      navigate({ to: redirect });
-    } catch (e) {
-      setErr(e instanceof Error ? e.message : "Google sign-in failed.");
-      setBusy(false);
-    }
-  }
 
   async function handleEmail(e: React.FormEvent) {
     e.preventDefault();
@@ -99,24 +77,7 @@ function LoginPage() {
         Save the library cards you qualify for and see every benefit they unlock - in one place.
       </p>
 
-      <Button
-        type="button"
-        variant="outline"
-        onClick={handleGoogle}
-        disabled={busy}
-        className="mt-6 w-full"
-      >
-        <GoogleIcon className="mr-2 h-4 w-4" />
-        Continue with Google
-      </Button>
-
-      <div className="my-6 flex items-center gap-3 text-xs uppercase tracking-wide text-muted-foreground">
-        <div className="h-px flex-1 bg-border" />
-        or
-        <div className="h-px flex-1 bg-border" />
-      </div>
-
-      <form onSubmit={handleEmail} className="space-y-4">
+      <form onSubmit={handleEmail} className="mt-6 space-y-4">
         <div>
           <Label htmlFor="email">Email</Label>
           <Input
@@ -177,13 +138,5 @@ function LoginPage() {
         By continuing you agree to our <Link to="/privacy" className="underline">Privacy Policy</Link>.
       </p>
     </div>
-  );
-}
-
-function GoogleIcon({ className }: { className?: string }) {
-  return (
-    <svg className={className} viewBox="0 0 24 24" aria-hidden="true">
-      <path fill="#EA4335" d="M12 10.2v3.9h5.5c-.2 1.4-1.6 4.1-5.5 4.1-3.3 0-6-2.7-6-6.1s2.7-6.1 6-6.1c1.9 0 3.1.8 3.9 1.5l2.6-2.6C17 3.4 14.7 2.4 12 2.4 6.7 2.4 2.4 6.7 2.4 12s4.3 9.6 9.6 9.6c5.5 0 9.2-3.9 9.2-9.4 0-.6-.1-1.1-.2-1.6L12 10.2z"/>
-    </svg>
   );
 }
