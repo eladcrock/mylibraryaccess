@@ -84,7 +84,7 @@ export const Route = createFileRoute("/_authenticated/my-benefits")({
   head: () => ({
     meta: [
       { title: "My benefits - Library Card Finder" },
-      { name: "description", content: "Every benefit unlocked by your saved library cards, side by side." },
+      { name: "description", content: "Included benefits unlocked by your saved library cards, side by side." },
       { name: "robots", content: "noindex" },
     ],
   }),
@@ -217,9 +217,9 @@ function MyBenefitsPage() {
       <p className="text-sm uppercase tracking-wide text-accent">Your library cards</p>
       <h1 className="mt-2 font-display text-4xl text-foreground">My benefits</h1>
       <p className="mt-3 max-w-2xl text-muted-foreground">
-        Every <strong>included</strong> benefit unlocked by the library cards you've saved,
-        with the per-card limits side by side. The more cards you hold, the more digital
-        benefits you can access at no extra cost.
+        These are <strong>included</strong> benefits unlocked by the library cards you've
+        saved, with the per-card limits side by side. The more cards you hold, the more
+        digital benefits you can access at no extra cost.
       </p>
       <p className="mt-3 max-w-2xl text-sm text-muted-foreground">
         These are the digital benefits we track. Visit each library's website or
