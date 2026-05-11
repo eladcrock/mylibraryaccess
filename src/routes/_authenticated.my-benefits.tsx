@@ -304,11 +304,9 @@ function BenefitSection({
         }
       >
         <div className="absolute inset-0 bg-gradient-to-r from-background/95 via-background/80 to-background/40" />
-        <div className="relative px-5 py-7 sm:px-7 sm:py-10">
-          <h2 className="text-2xl font-bold uppercase tracking-[0.18em] text-foreground sm:text-3xl">
-            {title}
-          </h2>
-          <p className="mt-2 text-sm text-foreground/75">{subtitle}</p>
+        <div className="relative px-5 py-6 sm:px-6 sm:py-8">
+          <h2 className="font-display text-2xl text-foreground drop-shadow-sm">{title}</h2>
+          <p className="mt-1 text-sm text-foreground/80">{subtitle}</p>
         </div>
       </div>
       <div className="mt-6 space-y-6">
@@ -319,8 +317,8 @@ function BenefitSection({
           >
             <header className="flex items-baseline justify-between gap-4">
               <div>
-                <h3 className="font-display text-lg text-foreground">{benefit.benefit_name}</h3>
-                <p className="text-[11px] uppercase tracking-wide text-muted-foreground">
+                <h3 className="font-display text-xl text-foreground">{benefit.benefit_name}</h3>
+                <p className="text-xs uppercase tracking-wide text-muted-foreground">
                   {benefit.benefit_category}
                 </p>
                 {benefit.benefit_url && (
