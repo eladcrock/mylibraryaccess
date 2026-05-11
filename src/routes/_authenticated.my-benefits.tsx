@@ -277,7 +277,7 @@ function BenefitSection({
                           {s.limit_text ?? <span className="text-muted-foreground">No limit listed</span>}
                         </td>
                         <td className="px-4 py-3 text-muted-foreground">
-                          {s.notes ? <Linkified text={s.notes} /> : "-"}
+                            <NotesCell row={s} />
                         </td>
                       </tr>
                     ))}
