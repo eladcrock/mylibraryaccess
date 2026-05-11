@@ -19,6 +19,7 @@ type Row = {
   benefit_id: string;
   benefit_name: string;
   benefit_category: string;
+  benefit_description: string | null;
   library_system_id: string;
   library_system_name: string;
   library_system_slug: string;
@@ -57,7 +58,7 @@ function MyBenefitsPage() {
             .from("library_benefits")
             .select("library_system_id,benefit_id,limit_text,notes")
             .in("library_system_id", ids),
-          supabase.from("benefits").select("id,name,category"),
+          supabase.from("benefits").select("id,name,category,description"),
         ]);
 
       if (sErr || lbErr || bErr) {
@@ -75,6 +76,7 @@ function MyBenefitsPage() {
           benefit_id: ben.id,
           benefit_name: ben.name,
           benefit_category: ben.category,
+          benefit_description: (ben as { description?: string | null }).description ?? null,
           library_system_id: sys.id,
           library_system_name: sys.name,
           library_system_slug: sys.slug,
@@ -160,6 +162,11 @@ function MyBenefitsPage() {
                   {systems.length} card{systems.length === 1 ? "" : "s"}
                 </span>
               </header>
+              {benefit.benefit_description && (
+                <p className="mt-2 text-sm text-muted-foreground">
+                  {benefit.benefit_description}
+                </p>
+              )}
 
               <div className="mt-4 overflow-hidden rounded-lg border border-border/60">
                 <table className="w-full text-sm">

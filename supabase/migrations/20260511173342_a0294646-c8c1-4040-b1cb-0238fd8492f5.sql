@@ -1,0 +1,1 @@
+UPDATE benefits SET description = 'Live online tutoring, writing help, and job/career coaching with real experts' WHERE name = 'Brainfuse';
