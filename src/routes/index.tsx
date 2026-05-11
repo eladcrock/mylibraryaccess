@@ -37,7 +37,7 @@ function Index() {
             </h1>
             <p className="mt-5 max-w-xl text-lg text-muted-foreground">
               Many California residents qualify for far more library cards than they realize.
-              Answer a few questions and we'll show you every card you can apply for - and what
+              Answer a few questions and we'll show you every card you can apply for, and what
               each one unlocks.
             </p>
             <div className="mt-8 flex flex-wrap gap-3">
