@@ -158,6 +158,12 @@ function AboutPage() {
           </Link>{" "}
           page and we'll correct the record.
         </p>
+        <figure className="mt-12 border-t border-border pt-8 text-center">
+          <blockquote className="text-base italic text-muted-foreground">
+            In loving memory of Inez Diaz Owen — a champion of libraries who
+            taught us the quiet power of resourcefulness.
+          </blockquote>
+        </figure>
       </div>
     </article>
   );
