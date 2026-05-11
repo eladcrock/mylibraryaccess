@@ -14,7 +14,7 @@ export const Route = createFileRoute("/login")({
   }),
   head: () => ({
     meta: [
-      { title: "Sign in — Library Card Finder" },
+      { title: "Sign in - Library Card Finder" },
       { name: "description", content: "Sign in to save your library cards and view all of your benefits in one place." },
       { name: "robots", content: "noindex" },
     ],
@@ -96,7 +96,7 @@ function LoginPage() {
         {mode === "signup" ? "Create your account" : "Sign in"}
       </h1>
       <p className="mt-2 text-sm text-muted-foreground">
-        Save the library cards you qualify for and see every benefit they unlock — in one place.
+        Save the library cards you qualify for and see every benefit they unlock - in one place.
       </p>
 
       <Button

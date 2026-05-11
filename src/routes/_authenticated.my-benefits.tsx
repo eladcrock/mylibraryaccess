@@ -7,7 +7,7 @@ import { Loader2, BookmarkPlus } from "lucide-react";
 export const Route = createFileRoute("/_authenticated/my-benefits")({
   head: () => ({
     meta: [
-      { title: "My benefits — Library Card Finder" },
+      { title: "My benefits - Library Card Finder" },
       { name: "description", content: "Every benefit unlocked by your saved library cards, side by side." },
       { name: "robots", content: "noindex" },
     ],
@@ -190,7 +190,7 @@ function MyBenefitsPage() {
                             {s.limit_text ?? <span className="text-muted-foreground">No limit listed</span>}
                           </td>
                           <td className="px-4 py-3 text-muted-foreground">
-                            {s.notes ?? "—"}
+                            {s.notes ?? "-"}
                           </td>
                         </tr>
                       ))}

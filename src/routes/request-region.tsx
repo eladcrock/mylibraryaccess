@@ -11,7 +11,7 @@ import { submitRegionRequest } from "@/lib/region-requests.functions";
 export const Route = createFileRoute("/request-region")({
   head: () => ({
     meta: [
-      { title: "Request a library region — Library Card Finder" },
+      { title: "Request a library region - Library Card Finder" },
       {
         name: "description",
         content:
@@ -58,7 +58,7 @@ function RequestRegionPage() {
     return (
       <div className="mx-auto max-w-2xl px-4 py-20 text-center">
         <CheckCircle2 className="mx-auto h-12 w-12 text-accent" />
-        <h1 className="mt-4 font-display text-3xl text-foreground">Thanks — request received</h1>
+        <h1 className="mt-4 font-display text-3xl text-foreground">Thanks - request received</h1>
         <p className="mt-3 text-muted-foreground">
           We'll review your suggestion and add it to our roadmap. If you left an email,
           we'll let you know once the region is live.
@@ -78,7 +78,7 @@ function RequestRegionPage() {
       </h1>
       <p className="mt-3 text-muted-foreground">
         We're starting with California and expanding nationwide. Tell us which county,
-        city, or specific library system you'd like us to add — the more detail, the better.
+        city, or specific library system you'd like us to add - the more detail, the better.
       </p>
 
       <form onSubmit={onSubmit} className="mt-8 space-y-5">
