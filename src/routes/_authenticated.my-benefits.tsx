@@ -230,6 +230,8 @@ function MyBenefitsPage() {
         Did we miss something?{" "}
         <a
           href="mailto:eladcrock@gmail.com?subject=Suggested%20library%20benefit%20to%20list"
+          target="_blank"
+          rel="noopener noreferrer"
           className="text-accent underline hover:no-underline"
         >
           Click here to submit a service that should be listed.
