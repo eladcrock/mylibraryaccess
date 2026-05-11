@@ -52,7 +52,7 @@ function NotesCell({ row }: { row: Row }) {
           rel="noopener noreferrer"
           className="inline-flex items-center gap-1 font-medium text-accent underline underline-offset-2 hover:opacity-80"
         >
-          {row.url ? "How to get started" : `Visit ${row.library_system_name}`}
+          {row.url ? "Learn more" : `Visit ${row.library_system_name}`}
           <ExternalLink className="h-3 w-3" />
         </a>
       )}
