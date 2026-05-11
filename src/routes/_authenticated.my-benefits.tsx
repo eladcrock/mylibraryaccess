@@ -312,7 +312,7 @@ function BenefitSection({
 
             <div className="mt-4 overflow-hidden rounded-lg border border-border/60">
               {/* Desktop / tablet table */}
-              <table className="hidden w-full text-sm sm:table">
+              <table className="hidden w-full text-sm lg:table">
                 <thead className="bg-paper/60 text-left text-xs uppercase tracking-wide text-muted-foreground">
                   <tr>
                     <th className="px-4 py-2 font-medium">Library system</th>
@@ -341,7 +341,7 @@ function BenefitSection({
               </table>
 
               {/* Mobile stacked list */}
-              <ul className="divide-y divide-border/60 sm:hidden">
+              <ul className="divide-y divide-border/60 lg:hidden">
                 {systems
                   .slice()
                   .sort((a, b) => a.library_system_name.localeCompare(b.library_system_name))
