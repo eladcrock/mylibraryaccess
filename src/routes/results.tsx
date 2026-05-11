@@ -166,7 +166,14 @@ function ResultsPage() {
       <p className="mt-3 text-muted-foreground">
         {systems.length} card{systems.length === 1 ? "" : "s"} match your answers.{" "}
         {user ? (
-          <>Save the ones you have to view them on <Link to="/my-benefits" className="text-accent underline">My benefits</Link>.</>
+          <>
+            Save the ones you have to view them on <Link to="/my-benefits" className="text-accent underline">My benefits</Link>.{" "}
+            {hasProfile ? (
+              <>Quick apply is on — <Link to="/profile" className="text-accent underline">edit your info</Link>.</>
+            ) : (
+              <><Link to="/profile" className="text-accent underline">Save your info</Link> for one-tap Quick apply.</>
+            )}
+          </>
         ) : (
           <>
             <Link to="/login" search={{ redirect: "/my-benefits", mode: "signin" }} className="text-accent underline">
