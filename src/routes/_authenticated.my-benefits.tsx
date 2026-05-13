@@ -17,7 +17,6 @@ import {
   Search,
   Languages as LanguagesIcon,
   Briefcase,
-  Sparkles,
   Ticket,
   Wrench,
   Package,
