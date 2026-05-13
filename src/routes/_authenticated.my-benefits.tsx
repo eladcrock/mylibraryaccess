@@ -112,6 +112,7 @@ function MyBenefitsPage() {
   const { user } = useAuth();
   const [rows, setRows] = useState<Row[] | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [reloadTick, setReloadTick] = useState(0);
 
   useEffect(() => {
     if (!user) return;
@@ -173,6 +174,26 @@ function MyBenefitsPage() {
 
     return () => {
       cancelled = true;
+    };
+  }, [user, reloadTick]);
+
+  // Refetch on tab focus and subscribe to favorites changes so cards saved
+  // on other devices show up without a manual reload.
+  useEffect(() => {
+    if (!user) return;
+    const onFocus = () => setReloadTick((t) => t + 1);
+    window.addEventListener("focus", onFocus);
+    const channel = supabase
+      .channel(`favorites-${user.id}`)
+      .on(
+        "postgres_changes",
+        { event: "*", schema: "public", table: "favorites", filter: `user_id=eq.${user.id}` },
+        () => setReloadTick((t) => t + 1),
+      )
+      .subscribe();
+    return () => {
+      window.removeEventListener("focus", onFocus);
+      supabase.removeChannel(channel);
     };
   }, [user]);
 
