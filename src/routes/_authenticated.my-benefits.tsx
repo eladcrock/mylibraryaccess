@@ -331,8 +331,7 @@ function MyBenefitsPage() {
 
   const activeSubcat = sub ? SUBCATS.find((s) => s.key === sub) ?? null : null;
 
-  const goToTiles = () =>
-    navigate({ to: "/_authenticated/my-benefits", search: {}, replace: false });
+  const goToTiles = () => navigate({ to: "/my-benefits", search: {} });
 
   if (error) {
     return (
@@ -507,7 +506,7 @@ function SubcatTileSection({
           return (
             <Link
               key={s.key}
-              to="/_authenticated/my-benefits"
+              to="/my-benefits"
               search={{ sub: s.key }}
               className="group flex flex-col items-start gap-2 rounded-xl border border-border bg-card p-4 transition hover:border-accent hover:shadow-md"
             >
