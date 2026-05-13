@@ -46,12 +46,10 @@ type SubcatKey =
   | "finance"
   | "research"
   | "languages"
-  | "digital-more"
   | "passes"
   | "create"
   | "borrow"
-  | "spaces"
-  | "inperson-more";
+  | "spaces";
 
 type SubcatDef = {
   key: SubcatKey;
@@ -319,9 +317,14 @@ function MyBenefitsPage() {
     if (grouped) {
       for (const g of grouped) {
         const isDigital = DIGITAL_CATEGORIES.has(g.benefit.benefit_category);
-        const fallback: SubcatKey = isDigital ? "digital-more" : "inperson-more";
-        const key = SLUG_TO_SUBCAT[g.benefit.benefit_slug] ?? fallback;
-        m.get(key)!.push(g);
+        const key = SLUG_TO_SUBCAT[g.benefit.benefit_slug];
+        if (key) {
+          m.get(key)!.push(g);
+        } else if (typeof console !== "undefined") {
+          console.warn(
+            `[my-benefits] Unmapped benefit slug "${g.benefit.benefit_slug}" (${isDigital ? "digital" : "in-person"})`,
+          );
+        }
       }
     }
     return m;
