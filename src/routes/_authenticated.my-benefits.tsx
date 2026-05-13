@@ -315,6 +315,25 @@ function MyBenefitsPage() {
     [grouped],
   );
 
+  const groupsBySubcat = useMemo(() => {
+    const m = new Map<SubcatKey, { benefit: Row; systems: Row[] }[]>();
+    for (const s of SUBCATS) m.set(s.key, []);
+    if (grouped) {
+      for (const g of grouped) {
+        const isDigital = DIGITAL_CATEGORIES.has(g.benefit.benefit_category);
+        const fallback: SubcatKey = isDigital ? "digital-more" : "inperson-more";
+        const key = SLUG_TO_SUBCAT[g.benefit.benefit_slug] ?? fallback;
+        m.get(key)!.push(g);
+      }
+    }
+    return m;
+  }, [grouped]);
+
+  const activeSubcat = sub ? SUBCATS.find((s) => s.key === sub) ?? null : null;
+
+  const goToTiles = () =>
+    navigate({ to: "/_authenticated/my-benefits", search: {}, replace: false });
+
   if (error) {
     return (
       <div className="mx-auto max-w-3xl px-4 py-12 text-center">
@@ -371,22 +390,55 @@ function MyBenefitsPage() {
             Find my cards
           </Link>
         </div>
+      ) : activeSubcat ? (
+        <div className="mt-8">
+          <nav className="flex items-center gap-2 text-sm text-muted-foreground">
+            <button onClick={goToTiles} className="hover:text-accent underline-offset-2 hover:underline">
+              My benefits
+            </button>
+            <span>/</span>
+            <span className="text-foreground">
+              {activeSubcat.section === "digital" ? "Digital" : "In-person"}
+            </span>
+            <span>/</span>
+            <span className="text-foreground">{activeSubcat.label}</span>
+          </nav>
+          <button
+            onClick={goToTiles}
+            className="mt-3 inline-flex items-center gap-1.5 text-sm font-medium text-accent hover:opacity-80"
+          >
+            <ArrowLeft className="h-4 w-4" /> Back to all categories
+          </button>
+          <h2 className="mt-4 font-display text-3xl text-foreground">{activeSubcat.label}</h2>
+          <p className="mt-1 text-sm text-muted-foreground">{activeSubcat.blurb}</p>
+          <div className="mt-6 space-y-6">
+            {(groupsBySubcat.get(activeSubcat.key) ?? []).length === 0 ? (
+              <div className="rounded-xl border border-dashed border-border bg-paper/40 p-8 text-center text-sm text-muted-foreground">
+                None of your saved cards include benefits in this category yet.
+              </div>
+            ) : (
+              <BenefitGroupList groups={groupsBySubcat.get(activeSubcat.key)!} />
+            )}
+          </div>
+        </div>
       ) : (
         <div className="mt-10 space-y-12">
           {digitalGroups.length > 0 && (
-            <BenefitSection
+            <SubcatTileSection
               title="Digital benefits"
               subtitle="Use these from anywhere with your library card."
-              groups={digitalGroups}
               banner={bannerDigital}
+              section="digital"
+              groupsBySubcat={groupsBySubcat}
             />
           )}
           {inPersonGroups.length > 0 && (
-            <BenefitSection
+            <SubcatTileSection
               title="In-person resources"
               subtitle="Visit a branch to borrow, book, or use these in person."
-              groups={inPersonGroups}
               banner={bannerInPerson}
+              section="inperson"
+              groupsBySubcat={groupsBySubcat}
             />
           )}
         </div>
