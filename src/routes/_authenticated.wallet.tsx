@@ -92,15 +92,23 @@ function WalletPage() {
       const [cardsRes, libsRes] = await Promise.all([
         supabase
           .from("library_cards")
-          .select("id, library_system_id, custom_label, card_number, pin, notes, library:library_systems(id, name)")
+          .select("id, library_system_id, custom_label, card_number, pin, notes")
           .eq("user_id", user.id)
           .order("created_at", { ascending: false }),
         supabase.from("library_systems").select("id, name").order("name"),
       ]);
       if (cancelled) return;
+      const libs = (libsRes.data ?? []) as LibrarySystem[];
+      const libMap = new Map(libs.map((l) => [l.id, l]));
       if (cardsRes.error) toast.error(cardsRes.error.message);
-      else setCards((cardsRes.data ?? []) as unknown as Card[]);
-      if (libsRes.data) setLibraries(libsRes.data as LibrarySystem[]);
+      else
+        setCards(
+          (cardsRes.data ?? []).map((c) => ({
+            ...(c as Card),
+            library: c.library_system_id ? libMap.get(c.library_system_id) ?? null : null,
+          })),
+        );
+      setLibraries(libs);
       setLoaded(true);
     })();
     return () => {
@@ -146,32 +154,36 @@ function WalletPage() {
       pin: form.pin.trim() || null,
       notes: form.notes.trim() || null,
     };
+    const libMap = new Map(libraries.map((l) => [l.id, l]));
+    function withLib(c: Card): Card {
+      return { ...c, library: c.library_system_id ? libMap.get(c.library_system_id) ?? null : null };
+    }
     if (editingId) {
       const { data, error } = await supabase
         .from("library_cards")
         .update(payload)
         .eq("id", editingId)
-        .select("id, library_system_id, custom_label, card_number, pin, notes, library:library_systems(id, name)")
+        .select("id, library_system_id, custom_label, card_number, pin, notes")
         .single();
       setSaving(false);
       if (error) {
         toast.error(error.message);
         return;
       }
-      setCards((prev) => prev.map((c) => (c.id === editingId ? (data as unknown as Card) : c)));
+      setCards((prev) => prev.map((c) => (c.id === editingId ? withLib(data as Card) : c)));
       toast.success("Card updated.");
     } else {
       const { data, error } = await supabase
         .from("library_cards")
         .insert(payload)
-        .select("id, library_system_id, custom_label, card_number, pin, notes, library:library_systems(id, name)")
+        .select("id, library_system_id, custom_label, card_number, pin, notes")
         .single();
       setSaving(false);
       if (error) {
         toast.error(error.message);
         return;
       }
-      setCards((prev) => [data as unknown as Card, ...prev]);
+      setCards((prev) => [withLib(data as Card), ...prev]);
       toast.success("Card saved.");
     }
     setDialogOpen(false);
