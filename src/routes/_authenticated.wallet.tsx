@@ -346,17 +346,17 @@ function CardRow({
       <div className="flex flex-wrap items-start justify-between gap-2">
         <h2 className="font-medium text-foreground">{title}</h2>
         <div className="flex gap-1">
-          <Button size="sm" variant="ghost" onClick={onEdit} aria-label="Edit card">
-            <Pencil className="h-4 w-4" />
+          <Button size="sm" variant="outline" onClick={onEdit} aria-label="Edit card">
+            <Pencil className="mr-1 h-4 w-4" /> Edit
           </Button>
           <Button
             size="sm"
-            variant="ghost"
+            variant="outline"
             onClick={onDelete}
             aria-label="Delete card"
-            className="text-destructive hover:text-destructive"
+            className="text-destructive hover:bg-destructive/10 hover:text-destructive"
           >
-            <Trash2 className="h-4 w-4" />
+            <Trash2 className="mr-1 h-4 w-4" /> Remove
           </Button>
         </div>
       </div>
