@@ -226,7 +226,7 @@ function WalletPage() {
         </div>
         <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
           <DialogTrigger asChild>
-            <Button onClick={openAdd}>
+            <Button onClick={() => openAdd()}>
               <Plus className="mr-1 h-4 w-4" /> Add card
             </Button>
           </DialogTrigger>
