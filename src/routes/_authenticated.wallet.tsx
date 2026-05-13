@@ -80,6 +80,7 @@ function WalletPage() {
   const [loaded, setLoaded] = useState(false);
   const [cards, setCards] = useState<Card[]>([]);
   const [libraries, setLibraries] = useState<LibrarySystem[]>([]);
+  const [favoriteLibIds, setFavoriteLibIds] = useState<string[]>([]);
   const [dialogOpen, setDialogOpen] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [form, setForm] = useState<FormState>(emptyForm);
@@ -89,13 +90,14 @@ function WalletPage() {
     if (!user) return;
     let cancelled = false;
     (async () => {
-      const [cardsRes, libsRes] = await Promise.all([
+      const [cardsRes, libsRes, favsRes] = await Promise.all([
         supabase
           .from("library_cards")
           .select("id, library_system_id, custom_label, card_number, pin, notes")
           .eq("user_id", user.id)
           .order("created_at", { ascending: false }),
         supabase.from("library_systems").select("id, name").order("name"),
+        supabase.from("favorites").select("library_system_id").eq("user_id", user.id),
       ]);
       if (cancelled) return;
       const libs = (libsRes.data ?? []) as LibrarySystem[];
@@ -109,6 +111,7 @@ function WalletPage() {
           })),
         );
       setLibraries(libs);
+      setFavoriteLibIds(((favsRes.data ?? []) as { library_system_id: string }[]).map((f) => f.library_system_id));
       setLoaded(true);
     })();
     return () => {
@@ -116,9 +119,9 @@ function WalletPage() {
     };
   }, [user]);
 
-  function openAdd() {
+  function openAdd(libraryId?: string) {
     setEditingId(null);
-    setForm(emptyForm);
+    setForm({ ...emptyForm, library_system_id: libraryId ?? "" });
     setDialogOpen(true);
   }
 
@@ -223,7 +226,7 @@ function WalletPage() {
         </div>
         <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
           <DialogTrigger asChild>
-            <Button onClick={openAdd}>
+            <Button onClick={() => openAdd()}>
               <Plus className="mr-1 h-4 w-4" /> Add card
             </Button>
           </DialogTrigger>
@@ -239,26 +242,79 @@ function WalletPage() {
       </div>
 
       <div className="mt-8">
-        {cards.length === 0 ? (
-          <div className="rounded-lg border border-dashed border-border p-8 text-center">
-            <Wallet className="mx-auto h-8 w-8 text-muted-foreground" />
-            <p className="mt-3 font-medium text-foreground">No cards saved yet</p>
-            <p className="mt-1 text-sm text-muted-foreground">
-              Add your first library card to keep its number and PIN handy.
-            </p>
-            <Button className="mt-4" onClick={openAdd}>
-              <Plus className="mr-1 h-4 w-4" /> Add your first card
-            </Button>
-          </div>
-        ) : (
-          <ul className="space-y-3">
-            {cards.map((c) => (
-              <CardRow key={c.id} card={c} onEdit={() => openEdit(c)} onDelete={() => onDelete(c.id)} />
-            ))}
-          </ul>
-        )}
+        <WalletList
+          cards={cards}
+          libraries={libraries}
+          favoriteLibIds={favoriteLibIds}
+          onAdd={openAdd}
+          onEdit={openEdit}
+          onDelete={onDelete}
+        />
       </div>
     </div>
+  );
+}
+
+function WalletList({
+  cards,
+  libraries,
+  favoriteLibIds,
+  onAdd,
+  onEdit,
+  onDelete,
+}: {
+  cards: Card[];
+  libraries: LibrarySystem[];
+  favoriteLibIds: string[];
+  onAdd: (libraryId?: string) => void;
+  onEdit: (c: Card) => void;
+  onDelete: (id: string) => void;
+}) {
+  const libMap = useMemo(() => new Map(libraries.map((l) => [l.id, l])), [libraries]);
+  const cardLibIds = new Set(cards.map((c) => c.library_system_id).filter(Boolean) as string[]);
+  const placeholders = favoriteLibIds
+    .filter((id) => !cardLibIds.has(id))
+    .map((id) => libMap.get(id))
+    .filter((l): l is LibrarySystem => !!l);
+
+  if (cards.length === 0 && placeholders.length === 0) {
+    return (
+      <div className="rounded-lg border border-dashed border-border p-8 text-center">
+        <Wallet className="mx-auto h-8 w-8 text-muted-foreground" />
+        <p className="mt-3 font-medium text-foreground">No cards yet</p>
+        <p className="mt-1 text-sm text-muted-foreground">
+          Save a library on the eligible cards page and it'll show up here, ready for your number and PIN.
+        </p>
+        <Button className="mt-4" onClick={() => onAdd()}>
+          <Plus className="mr-1 h-4 w-4" /> Add a card manually
+        </Button>
+      </div>
+    );
+  }
+
+  return (
+    <ul className="space-y-3">
+      {cards.map((c) => (
+        <CardRow key={c.id} card={c} onEdit={() => onEdit(c)} onDelete={() => onDelete(c.id)} />
+      ))}
+      {placeholders.map((lib) => (
+        <PlaceholderRow key={lib.id} library={lib} onAdd={() => onAdd(lib.id)} />
+      ))}
+    </ul>
+  );
+}
+
+function PlaceholderRow({ library, onAdd }: { library: LibrarySystem; onAdd: () => void }) {
+  return (
+    <li className="flex flex-wrap items-center justify-between gap-3 rounded-lg border border-dashed border-border bg-muted/30 p-4">
+      <div>
+        <h2 className="font-medium text-foreground">{library.name}</h2>
+        <p className="text-sm text-muted-foreground">No card number or PIN saved yet.</p>
+      </div>
+      <Button size="sm" onClick={onAdd}>
+        <Plus className="mr-1 h-4 w-4" /> Add details
+      </Button>
+    </li>
   );
 }
 
