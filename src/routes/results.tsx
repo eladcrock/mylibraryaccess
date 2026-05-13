@@ -225,8 +225,8 @@ function ResultsPage() {
             const isFav = favIds.has(s.id);
             return (
               <li key={s.id} className="rounded-xl border border-border bg-card p-5">
-                <div className="flex flex-wrap items-start justify-between gap-3">
-                  <div className="min-w-0 flex-1">
+                <div className="flex flex-col gap-4">
+                  <div className="min-w-0">
                     <h3 className="font-display text-xl text-foreground">{s.name}</h3>
                     {s.description ? (
                       <p className="mt-1 text-sm text-muted-foreground">{s.description}</p>
@@ -236,7 +236,7 @@ function ResultsPage() {
                       {s.online_signup ? "Online signup" : "In-person signup"}
                     </p>
                   </div>
-                  <div className="flex flex-wrap items-center gap-2">
+                  <div className="flex flex-wrap items-center gap-2 border-t border-border pt-3">
                     {s.apply_url ? (
                       hasProfile && profileText ? (
                         <button
