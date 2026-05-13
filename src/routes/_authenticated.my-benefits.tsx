@@ -82,7 +82,6 @@ const SUBCATS: SubcatDef[] = [
     slugs: ["ancestry-library", "heritagequest", "jstor"] },
   { key: "languages", section: "digital", label: "Languages", blurb: "Learn a new language.", icon: LanguagesIcon,
     slugs: ["mango", "rosetta-stone"] },
-  { key: "digital-more", section: "digital", label: "More", blurb: "Other digital benefits.", icon: Sparkles, slugs: [] },
 
   // In-person
   { key: "passes", section: "inperson", label: "Passes & Adventures", blurb: "Museums, parks, and outings.", icon: Ticket,
@@ -93,7 +92,6 @@ const SUBCATS: SubcatDef[] = [
     slugs: ["library-of-things", "hotspot-lending"] },
   { key: "spaces", section: "inperson", label: "Spaces", blurb: "Study and meeting rooms.", icon: DoorOpen,
     slugs: ["study-meeting-rooms"] },
-  { key: "inperson-more", section: "inperson", label: "More", blurb: "Other in-person resources.", icon: Sparkles, slugs: [] },
 ];
 
 const SLUG_TO_SUBCAT: Record<string, SubcatKey> = (() => {
