@@ -329,8 +329,10 @@ function CardRow({
 }) {
   const [showNumber, setShowNumber] = useState(false);
   const [showPin, setShowPin] = useState(false);
+  const [revealed, setRevealed] = useState(false);
 
   const title = card.library?.name || card.custom_label || "Library card";
+  const hasSecrets = !!(card.card_number || card.pin);
 
   async function copy(value: string, label: string) {
     try {
@@ -360,26 +362,49 @@ function CardRow({
           </Button>
         </div>
       </div>
-      <div className="mt-3 grid gap-3 sm:grid-cols-2">
-        {card.card_number ? (
-          <SecretField
-            label="Card number"
-            value={card.card_number}
-            shown={showNumber}
-            onToggle={() => setShowNumber((v) => !v)}
-            onCopy={() => copy(card.card_number!, "Card number")}
-          />
-        ) : null}
-        {card.pin ? (
-          <SecretField
-            label="PIN"
-            value={card.pin}
-            shown={showPin}
-            onToggle={() => setShowPin((v) => !v)}
-            onCopy={() => copy(card.pin!, "PIN")}
-          />
-        ) : null}
-      </div>
+      {hasSecrets ? (
+        revealed ? (
+          <div className="mt-3 grid gap-3 sm:grid-cols-2">
+            {card.card_number ? (
+              <SecretField
+                label="Card number"
+                value={card.card_number}
+                shown={showNumber}
+                onToggle={() => setShowNumber((v) => !v)}
+                onCopy={() => copy(card.card_number!, "Card number")}
+              />
+            ) : null}
+            {card.pin ? (
+              <SecretField
+                label="PIN"
+                value={card.pin}
+                shown={showPin}
+                onToggle={() => setShowPin((v) => !v)}
+                onCopy={() => copy(card.pin!, "PIN")}
+              />
+            ) : null}
+            <div className="sm:col-span-2">
+              <Button
+                size="sm"
+                variant="ghost"
+                onClick={() => {
+                  setRevealed(false);
+                  setShowNumber(false);
+                  setShowPin(false);
+                }}
+              >
+                <EyeOff className="mr-1 h-4 w-4" /> Hide account details
+              </Button>
+            </div>
+          </div>
+        ) : (
+          <div className="mt-3">
+            <Button size="sm" variant="outline" onClick={() => setRevealed(true)}>
+              <Eye className="mr-1 h-4 w-4" /> Show account details
+            </Button>
+          </div>
+        )
+      ) : null}
       {card.notes ? (
         <p className="mt-3 whitespace-pre-wrap text-sm text-muted-foreground">{card.notes}</p>
       ) : null}
