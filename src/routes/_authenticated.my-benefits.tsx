@@ -1,8 +1,28 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute, Link, useNavigate, useSearch } from "@tanstack/react-router";
 import { useEffect, useMemo, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/use-auth";
-import { Loader2, BookmarkPlus, ExternalLink, ArrowUpRight } from "lucide-react";
+import {
+  Loader2,
+  BookmarkPlus,
+  ExternalLink,
+  ArrowUpRight,
+  ArrowLeft,
+  Film,
+  Music,
+  BookOpen,
+  GraduationCap,
+  Newspaper,
+  TrendingUp,
+  Search,
+  Languages as LanguagesIcon,
+  Briefcase,
+  Sparkles,
+  Ticket,
+  Wrench,
+  Package,
+  DoorOpen,
+} from "lucide-react";
 import bannerDigital from "@/assets/banner-digital.jpg";
 import bannerInPerson from "@/assets/banner-inperson.jpg";
 
@@ -15,6 +35,72 @@ const DIGITAL_CATEGORIES = new Set([
   "research",
   "career",
 ]);
+
+type SubcatKey =
+  | "video"
+  | "music"
+  | "ebooks"
+  | "learning"
+  | "tutoring"
+  | "news"
+  | "finance"
+  | "research"
+  | "languages"
+  | "digital-more"
+  | "passes"
+  | "create"
+  | "borrow"
+  | "spaces"
+  | "inperson-more";
+
+type SubcatDef = {
+  key: SubcatKey;
+  section: "digital" | "inperson";
+  label: string;
+  blurb: string;
+  icon: React.ComponentType<{ className?: string }>;
+  slugs: string[];
+};
+
+const SUBCATS: SubcatDef[] = [
+  // Digital
+  { key: "video", section: "digital", label: "Video & Film", blurb: "Movies, documentaries, and series.", icon: Film,
+    slugs: ["kanopy", "hoopla", "alexander-street"] },
+  { key: "music", section: "digital", label: "Music", blurb: "Streaming and downloadable music.", icon: Music,
+    slugs: ["freegal", "naxos", "bay-beats"] },
+  { key: "ebooks", section: "digital", label: "eBooks & Comics", blurb: "Books, audiobooks, and comics.", icon: BookOpen,
+    slugs: ["libby", "bookflix", "tumblebooks", "comics-plus", "enki"] },
+  { key: "learning", section: "digital", label: "Learning & Courses", blurb: "Online classes and skill building.", icon: GraduationCap,
+    slugs: ["coursera", "creativebug", "gale-courses", "getsetup", "linkedin-learning", "oreilly", "driving-tests"] },
+  { key: "tutoring", section: "digital", label: "Tutoring & Career", blurb: "Homework help and job prep.", icon: Briefcase,
+    slugs: ["brainfuse", "tutor-com", "learningexpress", "vetnow"] },
+  { key: "news", section: "digital", label: "News & Magazines", blurb: "Major papers and magazines.", icon: Newspaper,
+    slugs: ["flipster", "nyt", "pressreader", "wsj", "washington-post"] },
+  { key: "finance", section: "digital", label: "Business & Finance", blurb: "Investment and consumer research.", icon: TrendingUp,
+    slugs: ["morningstar", "value-line", "consumer-reports"] },
+  { key: "research", section: "digital", label: "Research & Genealogy", blurb: "Archives, journals, family history.", icon: Search,
+    slugs: ["ancestry-library", "heritagequest", "jstor"] },
+  { key: "languages", section: "digital", label: "Languages", blurb: "Learn a new language.", icon: LanguagesIcon,
+    slugs: ["mango", "rosetta-stone"] },
+  { key: "digital-more", section: "digital", label: "More", blurb: "Other digital benefits.", icon: Sparkles, slugs: [] },
+
+  // In-person
+  { key: "passes", section: "inperson", label: "Passes & Adventures", blurb: "Museums, parks, and outings.", icon: Ticket,
+    slugs: ["museum-passes", "state-park-pass"] },
+  { key: "create", section: "inperson", label: "Create & Make", blurb: "Makerspaces and 3D printing.", icon: Wrench,
+    slugs: ["makerspace"] },
+  { key: "borrow", section: "inperson", label: "Borrow & Connect", blurb: "Things and Wi-Fi to borrow.", icon: Package,
+    slugs: ["library-of-things", "hotspot-lending"] },
+  { key: "spaces", section: "inperson", label: "Spaces", blurb: "Study and meeting rooms.", icon: DoorOpen,
+    slugs: ["study-meeting-rooms"] },
+  { key: "inperson-more", section: "inperson", label: "More", blurb: "Other in-person resources.", icon: Sparkles, slugs: [] },
+];
+
+const SLUG_TO_SUBCAT: Record<string, SubcatKey> = (() => {
+  const m: Record<string, SubcatKey> = {};
+  for (const s of SUBCATS) for (const slug of s.slugs) m[slug] = s.key;
+  return m;
+})();
 
 function Linkified({ text }: { text: string }) {
   const parts = text.split(/(https?:\/\/[^\s)]+)/g);
@@ -82,6 +168,8 @@ function MobileLinkButton({ row }: { row: Row }) {
   );
 }
 
+type SearchParams = { sub?: SubcatKey };
+
 export const Route = createFileRoute("/_authenticated/my-benefits")({
   head: () => ({
     meta: [
@@ -90,11 +178,16 @@ export const Route = createFileRoute("/_authenticated/my-benefits")({
       { name: "robots", content: "noindex" },
     ],
   }),
+  validateSearch: (s: Record<string, unknown>): SearchParams => {
+    const sub = typeof s.sub === "string" ? (s.sub as SubcatKey) : undefined;
+    return sub && SUBCATS.some((c) => c.key === sub) ? { sub } : {};
+  },
   component: MyBenefitsPage,
 });
 
 type Row = {
   benefit_id: string;
+  benefit_slug: string;
   benefit_name: string;
   benefit_category: string;
   benefit_description: string | null;
@@ -110,6 +203,8 @@ type Row = {
 
 function MyBenefitsPage() {
   const { user } = useAuth();
+  const navigate = useNavigate();
+  const { sub } = useSearch({ from: "/_authenticated/my-benefits" });
   const [rows, setRows] = useState<Row[] | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [reloadTick, setReloadTick] = useState(0);
@@ -140,7 +235,7 @@ function MyBenefitsPage() {
             .from("library_benefits")
             .select("library_system_id,benefit_id,limit_text,notes,url")
             .in("library_system_id", ids),
-          supabase.from("benefits").select("id,name,category,description,url"),
+          supabase.from("benefits").select("id,slug,name,category,description,url"),
         ]);
 
       if (sErr || lbErr || bErr) {
@@ -156,6 +251,7 @@ function MyBenefitsPage() {
         if (!sys || !ben) return [];
         return [{
           benefit_id: ben.id,
+          benefit_slug: (ben as { slug: string }).slug,
           benefit_name: ben.name,
           benefit_category: ben.category,
           benefit_description: (ben as { description?: string | null }).description ?? null,
@@ -219,6 +315,24 @@ function MyBenefitsPage() {
     [grouped],
   );
 
+  const groupsBySubcat = useMemo(() => {
+    const m = new Map<SubcatKey, { benefit: Row; systems: Row[] }[]>();
+    for (const s of SUBCATS) m.set(s.key, []);
+    if (grouped) {
+      for (const g of grouped) {
+        const isDigital = DIGITAL_CATEGORIES.has(g.benefit.benefit_category);
+        const fallback: SubcatKey = isDigital ? "digital-more" : "inperson-more";
+        const key = SLUG_TO_SUBCAT[g.benefit.benefit_slug] ?? fallback;
+        m.get(key)!.push(g);
+      }
+    }
+    return m;
+  }, [grouped]);
+
+  const activeSubcat = sub ? SUBCATS.find((s) => s.key === sub) ?? null : null;
+
+  const goToTiles = () => navigate({ to: "/my-benefits", search: {} });
+
   if (error) {
     return (
       <div className="mx-auto max-w-3xl px-4 py-12 text-center">
@@ -275,22 +389,55 @@ function MyBenefitsPage() {
             Find my cards
           </Link>
         </div>
+      ) : activeSubcat ? (
+        <div className="mt-8">
+          <nav className="flex items-center gap-2 text-sm text-muted-foreground">
+            <button onClick={goToTiles} className="hover:text-accent underline-offset-2 hover:underline">
+              My benefits
+            </button>
+            <span>/</span>
+            <span className="text-foreground">
+              {activeSubcat.section === "digital" ? "Digital" : "In-person"}
+            </span>
+            <span>/</span>
+            <span className="text-foreground">{activeSubcat.label}</span>
+          </nav>
+          <button
+            onClick={goToTiles}
+            className="mt-3 inline-flex items-center gap-1.5 text-sm font-medium text-accent hover:opacity-80"
+          >
+            <ArrowLeft className="h-4 w-4" /> Back to all categories
+          </button>
+          <h2 className="mt-4 font-display text-3xl text-foreground">{activeSubcat.label}</h2>
+          <p className="mt-1 text-sm text-muted-foreground">{activeSubcat.blurb}</p>
+          <div className="mt-6 space-y-6">
+            {(groupsBySubcat.get(activeSubcat.key) ?? []).length === 0 ? (
+              <div className="rounded-xl border border-dashed border-border bg-paper/40 p-8 text-center text-sm text-muted-foreground">
+                None of your saved cards include benefits in this category yet.
+              </div>
+            ) : (
+              <BenefitGroupList groups={groupsBySubcat.get(activeSubcat.key)!} />
+            )}
+          </div>
+        </div>
       ) : (
         <div className="mt-10 space-y-12">
           {digitalGroups.length > 0 && (
-            <BenefitSection
+            <SubcatTileSection
               title="Digital benefits"
               subtitle="Use these from anywhere with your library card."
-              groups={digitalGroups}
               banner={bannerDigital}
+              section="digital"
+              groupsBySubcat={groupsBySubcat}
             />
           )}
           {inPersonGroups.length > 0 && (
-            <BenefitSection
+            <SubcatTileSection
               title="In-person resources"
               subtitle="Visit a branch to borrow, book, or use these in person."
-              groups={inPersonGroups}
               banner={bannerInPerson}
+              section="inperson"
+              groupsBySubcat={groupsBySubcat}
             />
           )}
         </div>
@@ -299,40 +446,92 @@ function MyBenefitsPage() {
   );
 }
 
-function BenefitSection({
+function SectionBanner({
   title,
   subtitle,
-  groups,
   banner,
 }: {
   title: string;
   subtitle: string;
-  groups: { benefit: Row; systems: Row[] }[];
   banner?: string;
 }) {
   return (
-    <div>
-      <div
-        className="relative overflow-hidden rounded-xl border border-border"
-        style={
-          banner
-            ? {
-                backgroundImage: `url(${banner})`,
-                backgroundSize: "cover",
-                backgroundPosition: "center",
-              }
-            : undefined
-        }
-      >
-        <div className="absolute inset-0 bg-gradient-to-r from-background/95 via-background/80 to-background/40" />
-        <div className="relative px-5 py-6 sm:px-6 sm:py-8">
-          <h2 className="font-display text-2xl text-foreground drop-shadow-sm">{title}</h2>
-          <p className="mt-1 text-sm text-foreground/80">{subtitle}</p>
-        </div>
+    <div
+      className="relative overflow-hidden rounded-xl border border-border"
+      style={
+        banner
+          ? {
+              backgroundImage: `url(${banner})`,
+              backgroundSize: "cover",
+              backgroundPosition: "center",
+            }
+          : undefined
+      }
+    >
+      <div className="absolute inset-0 bg-gradient-to-r from-background/95 via-background/80 to-background/40" />
+      <div className="relative px-5 py-6 sm:px-6 sm:py-8">
+        <h2 className="font-display text-2xl text-foreground drop-shadow-sm">{title}</h2>
+        <p className="mt-1 text-sm text-foreground/80">{subtitle}</p>
       </div>
-      <div className="mt-6 space-y-6">
-        {groups.map(({ benefit, systems }) => (
-          <section
+    </div>
+  );
+}
+
+function SubcatTileSection({
+  title,
+  subtitle,
+  banner,
+  section,
+  groupsBySubcat,
+}: {
+  title: string;
+  subtitle: string;
+  banner?: string;
+  section: "digital" | "inperson";
+  groupsBySubcat: Map<SubcatKey, { benefit: Row; systems: Row[] }[]>;
+}) {
+  const tiles = SUBCATS.filter((s) => s.section === section).filter((s) => {
+    // Hide empty tiles, but always show "More" if it has anything.
+    return (groupsBySubcat.get(s.key) ?? []).length > 0;
+  });
+  if (tiles.length === 0) return null;
+  return (
+    <div>
+      <SectionBanner title={title} subtitle={subtitle} banner={banner} />
+      <div className="mt-6 grid grid-cols-2 gap-3 sm:grid-cols-3 sm:gap-4 lg:grid-cols-4">
+        {tiles.map((s) => {
+          const groups = groupsBySubcat.get(s.key) ?? [];
+          const cardCount = new Set(groups.flatMap((g) => g.systems.map((x) => x.library_system_id))).size;
+          const Icon = s.icon;
+          return (
+            <Link
+              key={s.key}
+              to="/my-benefits"
+              search={{ sub: s.key }}
+              className="group flex flex-col items-start gap-2 rounded-xl border border-border bg-card p-4 transition hover:border-accent hover:shadow-md"
+            >
+              <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-accent/10 text-accent">
+                <Icon className="h-5 w-5" />
+              </div>
+              <div className="font-display text-base text-foreground">{s.label}</div>
+              <div className="text-xs text-muted-foreground line-clamp-2">{s.blurb}</div>
+              <div className="mt-auto pt-2 text-xs font-medium text-accent">
+                {groups.length} service{groups.length === 1 ? "" : "s"}
+                {cardCount > 0 ? ` · ${cardCount} card${cardCount === 1 ? "" : "s"}` : ""}
+              </div>
+            </Link>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
+
+function BenefitGroupList({ groups }: { groups: { benefit: Row; systems: Row[] }[] }) {
+  return (
+    <div className="space-y-6">
+      {groups.map(({ benefit, systems }) => (
+        <section
             key={benefit.benefit_id}
             className="rounded-lg border border-border/50 bg-card p-4 sm:p-5"
           >
@@ -413,9 +612,8 @@ function BenefitSection({
                   ))}
               </ul>
             </div>
-          </section>
-        ))}
-      </div>
+        </section>
+      ))}
     </div>
   );
 }
