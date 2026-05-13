@@ -1,67 +1,34 @@
-## Goal
+## My Library Wallet
 
-1. Let visitors request that a new region (state/county/city) be added to the library data.
-2. Ship a Privacy Policy and Security page that accurately reflect what the app actually collects and how it's protected — and link them from the footer.
+A new authenticated page where users can securely store and quickly reference their library card numbers and PINs for each library system they have an account with.
 
-## 1. Request-a-region
+### User experience
 
-**New route** `src/routes/request-region.tsx`
-- Form fields: region (free text, e.g. "Travis County, TX"), optional library system name, optional library website URL, optional email (so we can notify when added), optional notes. Zod-validated, trimmed, length-capped.
-- Submits via a `createServerFn` that inserts into a new `region_requests` table.
-- Success state thanks the user; honeypot + simple rate-limit by IP hash to deter spam.
-- SEO `head()`: title "Request a library region — Library Card Finder", noindex'd is fine.
+- New nav link "My Wallet" (authenticated users only), route `/wallet`.
+- Page lists saved cards as tiles: library name, card number (masked by default with show/hide toggle), PIN (masked with show/hide), optional nickname/notes, and a "Copy" button for the number.
+- "Add card" button opens a dialog to pick a library system (searchable select pulled from `library_systems`) and enter card number, PIN, and optional notes.
+- Edit and delete actions per card.
+- Empty state explains what the wallet is for and links to `/my-benefits` to add cards.
 
-**New table** `region_requests`
-- Columns (domain): region, system_name, system_url, email, notes, status (`new` | `reviewed` | `added`), source_ip_hash.
-- RLS:
-  - Anonymous + authenticated users: INSERT only.
-  - Admins (`has_role(auth.uid(),'admin')`): SELECT / UPDATE.
-  - No public SELECT (protects submitter emails).
+### Data model
 
-**Entry points**
-- Footer: "Request a region" link.
-- Landing page: small CTA strip near the bottom — "Don't see your area? Request a region →".
-- Future results page (when built) will reuse the same link in its empty state.
+New table `public.library_cards`:
+- `user_id` (uuid, owner)
+- `library_system_id` (uuid, optional — links to a known library)
+- `custom_label` (text, optional — for libraries not in our DB)
+- `card_number` (text)
+- `pin` (text, nullable)
+- `notes` (text, nullable)
+- `created_at`, `updated_at`
 
-## 2. Privacy Policy (`/privacy`)
+RLS: users can only select/insert/update/delete their own rows (`auth.uid() = user_id`). Standard `updated_at` trigger.
 
-Written to match what the app actually does today, not boilerplate:
-- What we collect: optional account email + Google profile basics on sign-in; favorites; suggested corrections; region requests (with optional email); standard server logs.
-- What we don't: no ad tracking, no selling data, no third-party analytics beyond what Lovable Cloud provides for ops.
-- Cookies: only auth/session cookies from Lovable Cloud.
-- Third parties: Lovable Cloud (hosting + database + auth), Google (only if user signs in with Google).
-- Your rights: account deletion, data export on request, contact email placeholder `privacy@librarycardfinder.app` (user can swap later).
-- Children: not directed at children under 13.
-- Effective date + "last updated" stamp.
+### Security note
 
-## 3. Security page (`/security`)
+Card numbers and PINs are sensitive. Storage will be per-user with strict RLS so only the owner can read their rows. Values are stored as plain text in the database (same model as the existing `applicant_profiles` table). The UI masks values by default and only reveals on explicit user action. I'll add a clear notice on the page that this is for personal quick-reference and to use a strong account password. If you want stronger protection (client-side encryption with a passphrase only you know, so even the database can't read it), say so and I'll add that as a follow-up.
 
-Plain-English summary of real controls:
-- Transport: HTTPS everywhere.
-- Auth: email/password + Google OAuth via Lovable Cloud; sessions in httpOnly cookies; passwords never seen by us.
-- Authorization: Postgres Row Level Security on every table; admin-only tables for corrections, region requests, scrape jobs.
-- Data minimization: we only ask for email at signup; survey answers (county, status flags) stay client-side unless user chooses to save favorites.
-- Storage: managed Postgres with encryption at rest and automatic backups via Lovable Cloud.
-- Secrets: server-only API keys stored as Lovable Cloud secrets, never shipped to the browser.
-- Reporting: `security@librarycardfinder.app` placeholder for responsible disclosure; we aim to acknowledge within 72h.
-- What's out of scope today: no payments, no PII beyond email, no third-party trackers.
+### Files
 
-I'll also enable Lovable Cloud's leaked-password (HIBP) check during this pass since the Security page promises real password hygiene.
-
-## 4. Footer
-
-Update `src/components/site-footer.tsx` to a two-row layout:
-- Left: copyright.
-- Right: links — Request a region · Privacy · Security · Suggest a correction (when that page exists).
-
-## Technical notes
-
-- Migration creates `region_requests` + RLS + an `update_updated_at_column` trigger; reuses existing `app_role` enum and `has_role` function from prior auth migration.
-- Server fn lives at `src/lib/region-requests.functions.ts` (client-safe path), with `.inputValidator(zodSchema.parse)` and `.handler()` doing the insert with the service-role-free anon client (RLS allows the insert).
-- No business-logic changes elsewhere; eligibility engine and seed data untouched.
-- All three new pages added to the future sitemap route when it lands.
-
-## Out of scope
-
-- Admin UI for triaging region requests (data is captured; UI ships with the broader admin dashboard).
-- Email notifications to requesters (DB has the field; wiring requires a transactional email provider — flagged for a later pass).
+- New migration: create `library_cards` table + RLS + trigger.
+- New route: `src/routes/_authenticated.wallet.tsx` (list, add, edit, delete dialogs, mask/reveal/copy).
+- Add "My Wallet" link to `src/components/site-header.tsx` (authenticated nav).

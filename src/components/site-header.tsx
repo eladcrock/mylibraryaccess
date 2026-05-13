@@ -58,6 +58,14 @@ export function SiteHeader() {
             My benefits
           </Link>
           <Link
+            to="/wallet"
+            activeProps={activeProps}
+            className={navLinkClass}
+            onClick={() => setOpen(false)}
+          >
+            My wallet
+          </Link>
+          <Link
             to="/profile"
             activeProps={activeProps}
             className={navLinkClass}

@@ -250,6 +250,42 @@ export type Database = {
           },
         ]
       }
+      library_cards: {
+        Row: {
+          card_number: string
+          created_at: string
+          custom_label: string | null
+          id: string
+          library_system_id: string | null
+          notes: string | null
+          pin: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          card_number: string
+          created_at?: string
+          custom_label?: string | null
+          id?: string
+          library_system_id?: string | null
+          notes?: string | null
+          pin?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          card_number?: string
+          created_at?: string
+          custom_label?: string | null
+          id?: string
+          library_system_id?: string | null
+          notes?: string | null
+          pin?: string | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       library_systems: {
         Row: {
           apply_url: string | null
