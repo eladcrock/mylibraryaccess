@@ -1,8 +1,28 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute, Link, useNavigate, useSearch } from "@tanstack/react-router";
 import { useEffect, useMemo, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/use-auth";
-import { Loader2, BookmarkPlus, ExternalLink, ArrowUpRight } from "lucide-react";
+import {
+  Loader2,
+  BookmarkPlus,
+  ExternalLink,
+  ArrowUpRight,
+  ArrowLeft,
+  Film,
+  Music,
+  BookOpen,
+  GraduationCap,
+  Newspaper,
+  TrendingUp,
+  Search,
+  Languages as LanguagesIcon,
+  Briefcase,
+  Sparkles,
+  Ticket,
+  Wrench,
+  Package,
+  DoorOpen,
+} from "lucide-react";
 import bannerDigital from "@/assets/banner-digital.jpg";
 import bannerInPerson from "@/assets/banner-inperson.jpg";
 
@@ -15,6 +35,72 @@ const DIGITAL_CATEGORIES = new Set([
   "research",
   "career",
 ]);
+
+type SubcatKey =
+  | "video"
+  | "music"
+  | "ebooks"
+  | "learning"
+  | "tutoring"
+  | "news"
+  | "finance"
+  | "research"
+  | "languages"
+  | "digital-more"
+  | "passes"
+  | "create"
+  | "borrow"
+  | "spaces"
+  | "inperson-more";
+
+type SubcatDef = {
+  key: SubcatKey;
+  section: "digital" | "inperson";
+  label: string;
+  blurb: string;
+  icon: React.ComponentType<{ className?: string }>;
+  slugs: string[];
+};
+
+const SUBCATS: SubcatDef[] = [
+  // Digital
+  { key: "video", section: "digital", label: "Video & Film", blurb: "Movies, documentaries, and series.", icon: Film,
+    slugs: ["kanopy", "hoopla", "alexander-street"] },
+  { key: "music", section: "digital", label: "Music", blurb: "Streaming and downloadable music.", icon: Music,
+    slugs: ["freegal", "naxos", "bay-beats"] },
+  { key: "ebooks", section: "digital", label: "eBooks & Comics", blurb: "Books, audiobooks, and comics.", icon: BookOpen,
+    slugs: ["libby", "bookflix", "tumblebooks", "comics-plus", "enki"] },
+  { key: "learning", section: "digital", label: "Learning & Courses", blurb: "Online classes and skill building.", icon: GraduationCap,
+    slugs: ["coursera", "creativebug", "gale-courses", "getsetup", "linkedin-learning", "oreilly", "driving-tests"] },
+  { key: "tutoring", section: "digital", label: "Tutoring & Career", blurb: "Homework help and job prep.", icon: Briefcase,
+    slugs: ["brainfuse", "tutor-com", "learningexpress", "vetnow"] },
+  { key: "news", section: "digital", label: "News & Magazines", blurb: "Major papers and magazines.", icon: Newspaper,
+    slugs: ["flipster", "nyt", "pressreader", "wsj", "washington-post"] },
+  { key: "finance", section: "digital", label: "Business & Finance", blurb: "Investment and consumer research.", icon: TrendingUp,
+    slugs: ["morningstar", "value-line", "consumer-reports"] },
+  { key: "research", section: "digital", label: "Research & Genealogy", blurb: "Archives, journals, family history.", icon: Search,
+    slugs: ["ancestry-library", "heritagequest", "jstor"] },
+  { key: "languages", section: "digital", label: "Languages", blurb: "Learn a new language.", icon: LanguagesIcon,
+    slugs: ["mango", "rosetta-stone"] },
+  { key: "digital-more", section: "digital", label: "More", blurb: "Other digital benefits.", icon: Sparkles, slugs: [] },
+
+  // In-person
+  { key: "passes", section: "inperson", label: "Passes & Adventures", blurb: "Museums, parks, and outings.", icon: Ticket,
+    slugs: ["museum-passes", "state-park-pass"] },
+  { key: "create", section: "inperson", label: "Create & Make", blurb: "Makerspaces and 3D printing.", icon: Wrench,
+    slugs: ["makerspace"] },
+  { key: "borrow", section: "inperson", label: "Borrow & Connect", blurb: "Things and Wi-Fi to borrow.", icon: Package,
+    slugs: ["library-of-things", "hotspot-lending"] },
+  { key: "spaces", section: "inperson", label: "Spaces", blurb: "Study and meeting rooms.", icon: DoorOpen,
+    slugs: ["study-meeting-rooms"] },
+  { key: "inperson-more", section: "inperson", label: "More", blurb: "Other in-person resources.", icon: Sparkles, slugs: [] },
+];
+
+const SLUG_TO_SUBCAT: Record<string, SubcatKey> = (() => {
+  const m: Record<string, SubcatKey> = {};
+  for (const s of SUBCATS) for (const slug of s.slugs) m[slug] = s.key;
+  return m;
+})();
 
 function Linkified({ text }: { text: string }) {
   const parts = text.split(/(https?:\/\/[^\s)]+)/g);
@@ -82,6 +168,8 @@ function MobileLinkButton({ row }: { row: Row }) {
   );
 }
 
+type SearchParams = { sub?: SubcatKey };
+
 export const Route = createFileRoute("/_authenticated/my-benefits")({
   head: () => ({
     meta: [
@@ -90,6 +178,10 @@ export const Route = createFileRoute("/_authenticated/my-benefits")({
       { name: "robots", content: "noindex" },
     ],
   }),
+  validateSearch: (s: Record<string, unknown>): SearchParams => {
+    const sub = typeof s.sub === "string" ? (s.sub as SubcatKey) : undefined;
+    return sub && SUBCATS.some((c) => c.key === sub) ? { sub } : {};
+  },
   component: MyBenefitsPage,
 });
 
