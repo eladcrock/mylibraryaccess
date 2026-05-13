@@ -187,6 +187,7 @@ export const Route = createFileRoute("/_authenticated/my-benefits")({
 
 type Row = {
   benefit_id: string;
+  benefit_slug: string;
   benefit_name: string;
   benefit_category: string;
   benefit_description: string | null;
@@ -202,6 +203,8 @@ type Row = {
 
 function MyBenefitsPage() {
   const { user } = useAuth();
+  const navigate = useNavigate();
+  const { sub } = useSearch({ from: "/_authenticated/my-benefits" });
   const [rows, setRows] = useState<Row[] | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [reloadTick, setReloadTick] = useState(0);
@@ -232,7 +235,7 @@ function MyBenefitsPage() {
             .from("library_benefits")
             .select("library_system_id,benefit_id,limit_text,notes,url")
             .in("library_system_id", ids),
-          supabase.from("benefits").select("id,name,category,description,url"),
+          supabase.from("benefits").select("id,slug,name,category,description,url"),
         ]);
 
       if (sErr || lbErr || bErr) {
@@ -248,6 +251,7 @@ function MyBenefitsPage() {
         if (!sys || !ben) return [];
         return [{
           benefit_id: ben.id,
+          benefit_slug: (ben as { slug: string }).slug,
           benefit_name: ben.name,
           benefit_category: ben.category,
           benefit_description: (ben as { description?: string | null }).description ?? null,
