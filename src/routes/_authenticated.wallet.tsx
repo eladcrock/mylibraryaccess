@@ -130,7 +130,7 @@ function WalletPage() {
     setForm({
       library_system_id: card.library_system_id ?? "",
       custom_label: card.custom_label ?? "",
-      card_number: card.card_number,
+      card_number: card.card_number ?? "",
       pin: card.pin ?? "",
       notes: card.notes ?? "",
     });
@@ -361,13 +361,15 @@ function CardRow({
         </div>
       </div>
       <div className="mt-3 grid gap-3 sm:grid-cols-2">
-        <SecretField
-          label="Card number"
-          value={card.card_number}
-          shown={showNumber}
-          onToggle={() => setShowNumber((v) => !v)}
-          onCopy={() => copy(card.card_number, "Card number")}
-        />
+        {card.card_number ? (
+          <SecretField
+            label="Card number"
+            value={card.card_number}
+            shown={showNumber}
+            onToggle={() => setShowNumber((v) => !v)}
+            onCopy={() => copy(card.card_number!, "Card number")}
+          />
+        ) : null}
         {card.pin ? (
           <SecretField
             label="PIN"
