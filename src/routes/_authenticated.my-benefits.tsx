@@ -447,40 +447,92 @@ function MyBenefitsPage() {
   );
 }
 
-function BenefitSection({
+function SectionBanner({
   title,
   subtitle,
-  groups,
   banner,
 }: {
   title: string;
   subtitle: string;
-  groups: { benefit: Row; systems: Row[] }[];
   banner?: string;
 }) {
   return (
-    <div>
-      <div
-        className="relative overflow-hidden rounded-xl border border-border"
-        style={
-          banner
-            ? {
-                backgroundImage: `url(${banner})`,
-                backgroundSize: "cover",
-                backgroundPosition: "center",
-              }
-            : undefined
-        }
-      >
-        <div className="absolute inset-0 bg-gradient-to-r from-background/95 via-background/80 to-background/40" />
-        <div className="relative px-5 py-6 sm:px-6 sm:py-8">
-          <h2 className="font-display text-2xl text-foreground drop-shadow-sm">{title}</h2>
-          <p className="mt-1 text-sm text-foreground/80">{subtitle}</p>
-        </div>
+    <div
+      className="relative overflow-hidden rounded-xl border border-border"
+      style={
+        banner
+          ? {
+              backgroundImage: `url(${banner})`,
+              backgroundSize: "cover",
+              backgroundPosition: "center",
+            }
+          : undefined
+      }
+    >
+      <div className="absolute inset-0 bg-gradient-to-r from-background/95 via-background/80 to-background/40" />
+      <div className="relative px-5 py-6 sm:px-6 sm:py-8">
+        <h2 className="font-display text-2xl text-foreground drop-shadow-sm">{title}</h2>
+        <p className="mt-1 text-sm text-foreground/80">{subtitle}</p>
       </div>
-      <div className="mt-6 space-y-6">
-        {groups.map(({ benefit, systems }) => (
-          <section
+    </div>
+  );
+}
+
+function SubcatTileSection({
+  title,
+  subtitle,
+  banner,
+  section,
+  groupsBySubcat,
+}: {
+  title: string;
+  subtitle: string;
+  banner?: string;
+  section: "digital" | "inperson";
+  groupsBySubcat: Map<SubcatKey, { benefit: Row; systems: Row[] }[]>;
+}) {
+  const tiles = SUBCATS.filter((s) => s.section === section).filter((s) => {
+    // Hide empty tiles, but always show "More" if it has anything.
+    return (groupsBySubcat.get(s.key) ?? []).length > 0;
+  });
+  if (tiles.length === 0) return null;
+  return (
+    <div>
+      <SectionBanner title={title} subtitle={subtitle} banner={banner} />
+      <div className="mt-6 grid grid-cols-2 gap-3 sm:grid-cols-3 sm:gap-4 lg:grid-cols-4">
+        {tiles.map((s) => {
+          const groups = groupsBySubcat.get(s.key) ?? [];
+          const cardCount = new Set(groups.flatMap((g) => g.systems.map((x) => x.library_system_id))).size;
+          const Icon = s.icon;
+          return (
+            <Link
+              key={s.key}
+              to="/_authenticated/my-benefits"
+              search={{ sub: s.key }}
+              className="group flex flex-col items-start gap-2 rounded-xl border border-border bg-card p-4 transition hover:border-accent hover:shadow-md"
+            >
+              <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-accent/10 text-accent">
+                <Icon className="h-5 w-5" />
+              </div>
+              <div className="font-display text-base text-foreground">{s.label}</div>
+              <div className="text-xs text-muted-foreground line-clamp-2">{s.blurb}</div>
+              <div className="mt-auto pt-2 text-xs font-medium text-accent">
+                {groups.length} service{groups.length === 1 ? "" : "s"}
+                {cardCount > 0 ? ` · ${cardCount} card${cardCount === 1 ? "" : "s"}` : ""}
+              </div>
+            </Link>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
+
+function BenefitGroupList({ groups }: { groups: { benefit: Row; systems: Row[] }[] }) {
+  return (
+    <div className="space-y-6">
+      {groups.map(({ benefit, systems }) => (
+        <section
             key={benefit.benefit_id}
             className="rounded-lg border border-border/50 bg-card p-4 sm:p-5"
           >
@@ -561,9 +613,8 @@ function BenefitSection({
                   ))}
               </ul>
             </div>
-          </section>
-        ))}
-      </div>
+        </section>
+      ))}
     </div>
   );
 }
