@@ -252,7 +252,7 @@ export type Database = {
       }
       library_cards: {
         Row: {
-          card_number: string
+          card_number: string | null
           created_at: string
           custom_label: string | null
           id: string
@@ -263,7 +263,7 @@ export type Database = {
           user_id: string
         }
         Insert: {
-          card_number: string
+          card_number?: string | null
           created_at?: string
           custom_label?: string | null
           id?: string
@@ -274,7 +274,7 @@ export type Database = {
           user_id: string
         }
         Update: {
-          card_number?: string
+          card_number?: string | null
           created_at?: string
           custom_label?: string | null
           id?: string

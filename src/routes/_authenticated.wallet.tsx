@@ -53,7 +53,7 @@ type Card = {
   id: string;
   library_system_id: string | null;
   custom_label: string | null;
-  card_number: string;
+  card_number: string | null;
   pin: string | null;
   notes: string | null;
   library?: LibrarySystem | null;
@@ -130,7 +130,7 @@ function WalletPage() {
     setForm({
       library_system_id: card.library_system_id ?? "",
       custom_label: card.custom_label ?? "",
-      card_number: card.card_number,
+      card_number: card.card_number ?? "",
       pin: card.pin ?? "",
       notes: card.notes ?? "",
     });
@@ -140,12 +140,12 @@ function WalletPage() {
   async function onSubmit(e: React.FormEvent) {
     e.preventDefault();
     if (!user) return;
-    if (!form.card_number.trim()) {
-      toast.error("Card number is required.");
-      return;
-    }
     if (!form.library_system_id && !form.custom_label.trim()) {
       toast.error("Pick a library or add a custom label.");
+      return;
+    }
+    if (!form.card_number.trim() && !form.pin.trim() && !form.notes.trim()) {
+      toast.error("Add a card number, PIN, or note.");
       return;
     }
     setSaving(true);
@@ -153,7 +153,7 @@ function WalletPage() {
       user_id: user.id,
       library_system_id: form.library_system_id || null,
       custom_label: form.custom_label.trim() || null,
-      card_number: form.card_number.trim(),
+      card_number: form.card_number.trim() || null,
       pin: form.pin.trim() || null,
       notes: form.notes.trim() || null,
     };
@@ -361,13 +361,15 @@ function CardRow({
         </div>
       </div>
       <div className="mt-3 grid gap-3 sm:grid-cols-2">
-        <SecretField
-          label="Card number"
-          value={card.card_number}
-          shown={showNumber}
-          onToggle={() => setShowNumber((v) => !v)}
-          onCopy={() => copy(card.card_number, "Card number")}
-        />
+        {card.card_number ? (
+          <SecretField
+            label="Card number"
+            value={card.card_number}
+            shown={showNumber}
+            onToggle={() => setShowNumber((v) => !v)}
+            onCopy={() => copy(card.card_number!, "Card number")}
+          />
+        ) : null}
         {card.pin ? (
           <SecretField
             label="PIN"

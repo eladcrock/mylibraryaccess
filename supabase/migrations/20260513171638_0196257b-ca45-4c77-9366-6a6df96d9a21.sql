@@ -1,0 +1,1 @@
+ALTER TABLE public.library_cards ALTER COLUMN card_number DROP NOT NULL;
