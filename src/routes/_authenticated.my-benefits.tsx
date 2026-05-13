@@ -17,7 +17,6 @@ import {
   Search,
   Languages as LanguagesIcon,
   Briefcase,
-  Sparkles,
   Ticket,
   Wrench,
   Package,
@@ -46,12 +45,10 @@ type SubcatKey =
   | "finance"
   | "research"
   | "languages"
-  | "digital-more"
   | "passes"
   | "create"
   | "borrow"
-  | "spaces"
-  | "inperson-more";
+  | "spaces";
 
 type SubcatDef = {
   key: SubcatKey;
@@ -82,7 +79,6 @@ const SUBCATS: SubcatDef[] = [
     slugs: ["ancestry-library", "heritagequest", "jstor"] },
   { key: "languages", section: "digital", label: "Languages", blurb: "Learn a new language.", icon: LanguagesIcon,
     slugs: ["mango", "rosetta-stone"] },
-  { key: "digital-more", section: "digital", label: "More", blurb: "Other digital benefits.", icon: Sparkles, slugs: [] },
 
   // In-person
   { key: "passes", section: "inperson", label: "Passes & Adventures", blurb: "Museums, parks, and outings.", icon: Ticket,
@@ -93,7 +89,6 @@ const SUBCATS: SubcatDef[] = [
     slugs: ["library-of-things", "hotspot-lending"] },
   { key: "spaces", section: "inperson", label: "Spaces", blurb: "Study and meeting rooms.", icon: DoorOpen,
     slugs: ["study-meeting-rooms"] },
-  { key: "inperson-more", section: "inperson", label: "More", blurb: "Other in-person resources.", icon: Sparkles, slugs: [] },
 ];
 
 const SLUG_TO_SUBCAT: Record<string, SubcatKey> = (() => {
@@ -321,9 +316,14 @@ function MyBenefitsPage() {
     if (grouped) {
       for (const g of grouped) {
         const isDigital = DIGITAL_CATEGORIES.has(g.benefit.benefit_category);
-        const fallback: SubcatKey = isDigital ? "digital-more" : "inperson-more";
-        const key = SLUG_TO_SUBCAT[g.benefit.benefit_slug] ?? fallback;
-        m.get(key)!.push(g);
+        const key = SLUG_TO_SUBCAT[g.benefit.benefit_slug];
+        if (key) {
+          m.get(key)!.push(g);
+        } else if (typeof console !== "undefined") {
+          console.warn(
+            `[my-benefits] Unmapped benefit slug "${g.benefit.benefit_slug}" (${isDigital ? "digital" : "in-person"})`,
+          );
+        }
       }
     }
     return m;
